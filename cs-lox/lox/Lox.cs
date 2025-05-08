@@ -45,7 +45,14 @@
     Environment.Exit((int)exitCode);
   }
 
-  static void Run(string source) {}
+  static void Run(string source) {
+    var scanner = new Scanner(source);
+    var tokens = scanner.ProduceTokens();
+
+    tokens.ForEach((token) => {
+      Console.WriteLine(token);
+    });
+  }
 }
 
 enum ExitCode : int {
