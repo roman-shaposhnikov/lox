@@ -1,4 +1,7 @@
 ﻿class Lox {
+  static public Boolean hadError = false;
+  static public Boolean hadRuntimeError = false;
+
   static void Main(string[] args) {
     if (args.Length > 1) {
       ReportTooManyArgsError();
@@ -14,15 +17,29 @@
     ExitWithCode(ExitCode.CLIArgsError);
   }
 
-  static void RunFile(string path) {}
+  static void RunFile(string path) {
+    string source = File.ReadAllText(path);
+    Run(source);
+
+    if (hadError) {
+      ExitWithCode(ExitCode.DataFormatError);
+    }
+    if (hadRuntimeError) {
+      ExitWithCode(ExitCode.InternalProgramError);
+    }
+  }
 
   static void RunPrompt() {}
 
   static void ExitWithCode(ExitCode exitCode) {
     Environment.Exit((int)exitCode);
   }
+
+  static void Run(string source) {}
 }
 
 enum ExitCode : int {
   CLIArgsError = 64,
+  DataFormatError = 65,
+  InternalProgramError = 70,
 }
