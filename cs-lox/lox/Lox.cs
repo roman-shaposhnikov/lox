@@ -29,7 +29,17 @@
     }
   }
 
-  static void RunPrompt() {}
+  static void RunPrompt() {
+    while (true) {
+      string? line  = Console.ReadLine();
+      if (line == null) {
+        break;
+      }
+
+      Run(line);
+      hadError = false;
+    }
+  }
 
   static void ExitWithCode(ExitCode exitCode) {
     Environment.Exit((int)exitCode);
