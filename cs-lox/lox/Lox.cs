@@ -9,9 +9,20 @@
     };
   }
 
-  static void ReportTooManyArgsError() {}
+  static void ReportTooManyArgsError() {
+    Console.WriteLine("Usage: cs-lox [script]");
+    ExitWithCode(ExitCode.CLIArgsError);
+  }
 
   static void RunFile(string path) {}
 
   static void RunPrompt() {}
+
+  static void ExitWithCode(ExitCode exitCode) {
+    Environment.Exit((int)exitCode);
+  }
+}
+
+enum ExitCode : int {
+  CLIArgsError = 64,
 }
