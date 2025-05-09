@@ -7,6 +7,9 @@ class Scanner(string source) {
   int currentCharIndex = 0;
   int currentScanningLine = 1;
 
+  const char EOF = '\0';
+  const char NEW_LINE = '\n';
+
   public List<Token> ProduceTokens() {
     while (!CheckIsEOFReached()) {
       // We are at the beginning of the next lexeme.
@@ -28,6 +31,12 @@ class Scanner(string source) {
     var singleCharacterScanResult = ScanSingleCharacterToken(character);
     if (singleCharacterScanResult != null) {
       AddToken(singleCharacterScanResult.Value);
+      return;
+    }
+
+    var doubleCharacterScanResult = ScanDoubleCharacterToken(character);
+    if (doubleCharacterScanResult != null) {
+      AddToken(doubleCharacterScanResult.Value);
       return;
     }
 
@@ -54,6 +63,24 @@ class Scanner(string source) {
     };
   }
 
+  TokenType? ScanDoubleCharacterToken(char character) {
+    return character switch {
+      '!' => MoveToNextCharIfMatched('=')
+          ? TokenType.BANG_EQUAL
+          : TokenType.BANG,
+      '=' => MoveToNextCharIfMatched('=')
+          ? TokenType.EQUAL_EQUAL
+          : TokenType.EQUAL,
+      '<' => MoveToNextCharIfMatched('=')
+          ? TokenType.LESS_EQUAL
+          : TokenType.LESS,
+      '>' => MoveToNextCharIfMatched('=')
+          ? TokenType.GREATER_EQUAL
+          : TokenType.GREATER,
+      _ => null,
+    };
+  }
+
   void AddToken(TokenType type) {
     AddToken(type, null);
   }
@@ -67,5 +94,26 @@ class Scanner(string source) {
 
   string SelectCurrentLexeme() {
     return source.Substring(startScanningIndex, currentCharIndex);
+  }
+
+  bool MoveToNextCharIfMatched(char expected) {
+    if (CheckIsEOFReached()) {
+      return false;
+    }
+
+    if (PeekCurrentChar() != expected) {
+      return false;
+    }
+
+    currentCharIndex++;
+    return true;
+  }
+
+  char PeekCurrentChar() {
+    if (CheckIsEOFReached()) {
+      return EOF;
+    }
+
+    return source[currentCharIndex];
   }
 }
