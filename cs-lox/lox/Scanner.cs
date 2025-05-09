@@ -61,6 +61,11 @@ class Scanner(string source) {
     }
 
     switch (character) {
+      case '/': {
+        ScanSlash();
+        return;
+      }
+
       // Meaningless characters.
       case ' ':
       case '\r':
@@ -181,6 +186,60 @@ class Scanner(string source) {
       TokenType.NUMBER,
       float.Parse(SelectCurrentLexeme())
     );
+  }
+
+  void ScanSlash() {
+    if (MoveToNextCharIfMatched('/')) {
+      ScanSingleLineComment();
+    } else if (MoveToNextCharIfMatched('*')) {
+      ScanMultiLineComment();
+    } else {
+      AddToken(TokenType.SLASH);
+    }
+  }
+
+  void ScanSingleLineComment() {
+    // A comment goes until the end of the line.
+    while (true) {
+      var currentChar = MoveToNextChar();
+      bool isLineBreak = currentChar == NEW_LINE;
+      var isEOF = CheckIsEOFReached();
+      if (isLineBreak || isEOF) {
+        return;
+      }
+    }
+  }
+
+  void ScanMultiLineComment() {
+    while (true) {
+      var currentChar = MoveToNextChar();
+
+      var isEOF = CheckIsEOFReached();
+      if (isEOF) {
+        return;
+      }
+
+      var isLineBreak = currentChar == NEW_LINE;
+      if (isLineBreak) {
+        MoveToNextLine();
+        continue;
+      }
+
+      bool currentCharIsStar = currentChar == '*';
+      bool nextCharIsSlash = MoveToNextCharIfMatched('/');
+      bool isMultiLineCommentEnd = currentCharIsStar && nextCharIsSlash;
+      if (isMultiLineCommentEnd) {
+        return;
+      }
+
+      bool currentCharIsSlash = currentChar == '/';
+      bool nextCharIsStar = MoveToNextCharIfMatched('*');
+      bool isInnerMultiLineCommentStart = currentCharIsSlash && nextCharIsStar;
+      if (isInnerMultiLineCommentStart) {
+        ScanMultiLineComment();
+        continue;
+      }
+    }
   }
 
   void AddToken(TokenType type) {
