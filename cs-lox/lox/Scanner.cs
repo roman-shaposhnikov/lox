@@ -250,7 +250,9 @@ class Scanner(string source) {
   }
 
   string SelectCurrentLexeme() {
-    return source.Substring(startScanningIndex, currentCharIndex);
+    var lexemeLength = currentCharIndex - startScanningIndex;
+
+    return source.Substring(startScanningIndex, lexemeLength);
   }
 
   bool MoveToNextCharIfMatched(char expected) {
