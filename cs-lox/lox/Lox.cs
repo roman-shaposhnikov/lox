@@ -58,6 +58,14 @@
     ReportError(line, "", message);
   }
 
+  public static void Error(Token token, string message) {
+    if (token.type == TokenType.EOF) {
+      ReportError(token.line, " at end", message);
+    } else {
+      ReportError(token.line, " at '" + token.lexeme + "'", message);
+    }
+  }
+
   static void ReportError(int line, string where, string message) {
     Console.WriteLine("[line " + line + "] Error" + where + ": " + message);
     hadError = true;
