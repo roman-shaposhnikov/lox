@@ -31,7 +31,7 @@ class Scanner(string source) {
   }
 
   public List<Token> ProduceTokens() {
-    while (!CheckIsEOFReached()) {
+    while (!IsEOFReached()) {
       // We are at the beginning of the next lexeme.
       startScanningIndex = currentCharIndex;
       ScanToken();
@@ -40,10 +40,6 @@ class Scanner(string source) {
     tokens.Add(new Token(TokenType.EOF, "", null, currentScanningLine));
 
     return tokens;
-  }
-
-  bool CheckIsEOFReached() {
-    return currentCharIndex >= source.Length;
   }
 
   void ScanToken() {
@@ -141,7 +137,7 @@ class Scanner(string source) {
   void ScanString() {
     while (
       PeekCurrentChar() != '"' &&
-      !CheckIsEOFReached()
+      !IsEOFReached()
     ) {
       if (PeekCurrentChar() == NEW_LINE) {
         MoveToNextLine();
@@ -149,7 +145,7 @@ class Scanner(string source) {
       MoveToNextChar();
     }
 
-    if (CheckIsEOFReached()) {
+    if (IsEOFReached()) {
       Lox.Error(currentScanningLine, "Unterminated string.");
       return;
     }
@@ -203,7 +199,7 @@ class Scanner(string source) {
     while (true) {
       var currentChar = MoveToNextChar();
       bool isLineBreak = currentChar == NEW_LINE;
-      var isEOF = CheckIsEOFReached();
+      var isEOF = IsEOFReached();
       if (isLineBreak || isEOF) {
         return;
       }
@@ -214,7 +210,7 @@ class Scanner(string source) {
     while (true) {
       var currentChar = MoveToNextChar();
 
-      var isEOF = CheckIsEOFReached();
+      var isEOF = IsEOFReached();
       if (isEOF) {
         return;
       }
@@ -258,7 +254,7 @@ class Scanner(string source) {
   }
 
   bool MoveToNextCharIfMatched(char expected) {
-    if (CheckIsEOFReached()) {
+    if (IsEOFReached()) {
       return false;
     }
 
@@ -271,7 +267,7 @@ class Scanner(string source) {
   }
 
   char PeekCurrentChar() {
-    if (CheckIsEOFReached()) {
+    if (IsEOFReached()) {
       return EOF;
     }
 
@@ -317,4 +313,9 @@ class Scanner(string source) {
   bool IsAlphaNumeric(char character) {
     return IsAlphabetic(character) || IsDigit(character);
   }
+
+  bool IsEOFReached() {
+    return currentCharIndex >= source.Length;
+  }
+
 }
