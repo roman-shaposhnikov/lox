@@ -59,6 +59,11 @@ class Scanner(string source) {
       }
 
       default: {
+        if (IsDigit(character)) {
+          ScanNumber();
+          return;
+        }
+
         Lox.Error(currentScanningLine, "Unexpected character.");
         return;
       }
@@ -127,6 +132,32 @@ class Scanner(string source) {
     AddToken(TokenType.STRING, value);
   }
 
+  void ScanNumber() {
+    while (IsDigit(PeekCurrentChar())) {
+      MoveToNextChar();
+    }
+
+    // Look for a fractional part.
+    var isCurrentCharDot = PeekCurrentChar() == '.';
+    var isNextCharDigit = IsDigit(
+      PeekNextFollowingChar()
+    );
+    var shouldScanFractionalPart = isCurrentCharDot && isNextCharDigit;
+    if (shouldScanFractionalPart) {
+      // Consume the "."
+      MoveToNextChar();
+
+      while (IsDigit(PeekCurrentChar())) {
+        MoveToNextChar();
+      }
+    }
+
+    AddToken(
+      TokenType.NUMBER,
+      float.Parse(SelectCurrentLexeme())
+    );
+  }
+
   void AddToken(TokenType type) {
     AddToken(type, null);
   }
@@ -163,7 +194,19 @@ class Scanner(string source) {
     return source[currentCharIndex];
   }
 
+  char PeekNextFollowingChar() {
+    if (currentCharIndex + 1 >= source.Length) {
+      return EOF;
+    }
+
+    return source[currentCharIndex + 1];
+  }
+
   void MoveToNextLine() {
     currentScanningLine++;
+  }
+
+  bool IsDigit(char character ) {
+    return char.IsDigit(character);
   }
 }
