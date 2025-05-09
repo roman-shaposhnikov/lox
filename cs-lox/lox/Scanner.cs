@@ -53,6 +53,11 @@ class Scanner(string source) {
         return;
       }
 
+      case '"': {
+        ScanString();
+        return;
+      }
+
       default: {
         Lox.Error(currentScanningLine, "Unexpected character.");
         return;
@@ -96,6 +101,30 @@ class Scanner(string source) {
           : TokenType.GREATER,
       _ => null,
     };
+  }
+
+  void ScanString() {
+    while (
+      PeekCurrentChar() != '"' &&
+      !CheckIsEOFReached()
+    ) {
+      if (PeekCurrentChar() == NEW_LINE) {
+        MoveToNextLine();
+      }
+      MoveToNextChar();
+    }
+
+    if (CheckIsEOFReached()) {
+      Lox.Error(currentScanningLine, "Unterminated string.");
+      return;
+    }
+
+    // The closing ".
+    MoveToNextChar();
+
+    // Trim the surrounding quotes.
+    string value = source.Substring(startScanningIndex + 1, currentCharIndex - 1);
+    AddToken(TokenType.STRING, value);
   }
 
   void AddToken(TokenType type) {
