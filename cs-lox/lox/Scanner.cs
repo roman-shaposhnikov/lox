@@ -10,6 +10,26 @@ class Scanner(string source) {
   const char EOF = '\0';
   const char NEW_LINE = '\n';
 
+  static Dictionary<string, TokenType> keywords = [];
+  static Scanner() {
+    keywords.Add("and", TokenType.AND);
+    keywords.Add("class", TokenType.CLASS);
+    keywords.Add("else", TokenType.ELSE);
+    keywords.Add("false", TokenType.FALSE);
+    keywords.Add("for", TokenType.FOR);
+    keywords.Add("fun", TokenType.FUN);
+    keywords.Add("if", TokenType.IF);
+    keywords.Add("nil", TokenType.NIL);
+    keywords.Add("or", TokenType.OR);
+    keywords.Add("print", TokenType.PRINT);
+    keywords.Add("return", TokenType.RETURN);
+    keywords.Add("super", TokenType.SUPER);
+    keywords.Add("this", TokenType.THIS);
+    keywords.Add("true", TokenType.TRUE);
+    keywords.Add("var", TokenType.VAR);
+    keywords.Add("while", TokenType.WHILE);
+  }
+
   public List<Token> ProduceTokens() {
     while (!CheckIsEOFReached()) {
       // We are at the beginning of the next lexeme.
@@ -61,6 +81,11 @@ class Scanner(string source) {
       default: {
         if (IsDigit(character)) {
           ScanNumber();
+          return;
+        }
+
+        if (IsAlphabetic(character)) {
+          ScanIdentifier();
           return;
         }
 
@@ -208,5 +233,29 @@ class Scanner(string source) {
 
   bool IsDigit(char character ) {
     return char.IsDigit(character);
+  }
+
+  bool IsAlphabetic(char character) {
+    return (
+      (character >= 'a' && character <= 'z') ||
+      (character >= 'A' && character <= 'Z') ||
+      character == '_'
+    );
+  }
+
+  void ScanIdentifier() {
+    while (IsAlphaNumeric(PeekCurrentChar())) {
+      MoveToNextChar();
+    }
+
+    var lexeme = SelectCurrentLexeme();
+    var lexemeIsKeyword = keywords.TryGetValue(lexeme, out TokenType keywordType);
+    var tokenType = lexemeIsKeyword ? keywordType : TokenType.IDENTIFIER;
+
+    AddToken(tokenType);
+  }
+
+  bool IsAlphaNumeric(char character) {
+    return IsAlphabetic(character) || IsDigit(character);
   }
 }
