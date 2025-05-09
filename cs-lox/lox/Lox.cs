@@ -53,6 +53,15 @@
       Console.WriteLine(token);
     });
   }
+
+  public static void Error(int line, string message) {
+    ReportError(line, "", message);
+  }
+
+  static void ReportError(int line, string where, string message) {
+    Console.WriteLine("[line " + line + "] Error" + where + ": " + message);
+    hadError = true;
+  }
 }
 
 enum ExitCode : int {
