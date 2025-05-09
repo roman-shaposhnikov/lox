@@ -4,6 +4,14 @@ class Parser(Token[] tokens) {
   readonly Token[] tokens = tokens;
   int currentTokenIndex = 0;
 
+  public Expression? Parse() {
+    try {
+      return ParseExpression();
+    } catch (ParseError) {
+      return null;
+    }
+  }
+
   Expression ParseExpression() {
     return ParseEquality();
   }
