@@ -48,6 +48,11 @@ class Scanner(string source) {
         return; // Ignore whitespace.
       }
 
+      case NEW_LINE: {
+        MoveToNextLine();
+        return;
+      }
+
       default: {
         Lox.Error(currentScanningLine, "Unexpected character.");
         return;
@@ -127,5 +132,9 @@ class Scanner(string source) {
     }
 
     return source[currentCharIndex];
+  }
+
+  void MoveToNextLine() {
+    currentScanningLine++;
   }
 }
