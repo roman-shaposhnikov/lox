@@ -107,6 +107,8 @@ class Parser(Token[] tokens) {
 
       return new Grouping(expr);
     }
+
+    throw CreateParseError(PeekCurrentToken(), "Expect expression.");
   }
 
   bool MoveToNextIfMatchOneOf(params TokenType[] types) {
@@ -150,5 +152,47 @@ class Parser(Token[] tokens) {
     return tokens.ElementAt(currentTokenIndex - 1);
   }
 
-  Token ReportErrorIfNotMatch(TokenType type, string message) {}
+  Token ReportErrorIfNotMatch(TokenType type, string message) {
+    if (CurrentTokenIsTypeOf(type)) {
+      return MoveToNextToken();
+    }
+
+    throw CreateParseError(PeekCurrentToken(), message);
+  }
+
+  ParseError CreateParseError(Token token, string message) {
+    Lox.Error(token, message);
+
+    return new ParseError();
+  }
+
+  void Synchronize() {
+    MoveToNextToken();
+
+    while (!IsAtEnd()) {
+      if (PeekPreviousToken().IsTypeOf(TokenType.SEMICOLON)) {
+        return;
+      }
+
+      TokenType[] statementStartTokens = [
+        TokenType.CLASS,
+        TokenType.FUN,
+        TokenType.VAR,
+        TokenType.FOR,
+        TokenType.IF,
+        TokenType.WHILE,
+        TokenType.PRINT,
+        TokenType.RETURN
+      ];
+
+      TokenType currentTokenType = PeekCurrentToken().type;
+      bool currentTokenStartsStatement = statementStartTokens.Contains(currentTokenType);
+
+      if (currentTokenStartsStatement) {
+        return;
+      }
+
+      MoveToNextToken();
+    }
+  }
 }
