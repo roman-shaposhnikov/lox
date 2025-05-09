@@ -40,7 +40,19 @@ class Scanner(string source) {
       return;
     }
 
-    Lox.Error(currentScanningLine, "Unexpected character.");
+    switch (character) {
+      // Meaningless characters.
+      case ' ':
+      case '\r':
+      case '\t': {
+        return; // Ignore whitespace.
+      }
+
+      default: {
+        Lox.Error(currentScanningLine, "Unexpected character.");
+        return;
+      }
+    }
   }
 
   char MoveToNextChar() {
