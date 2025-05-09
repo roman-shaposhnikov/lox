@@ -30,6 +30,8 @@ class Scanner(string source) {
       AddToken(singleCharacterScanResult.Value);
       return;
     }
+
+    Lox.Error(currentScanningLine, "Unexpected character.");
   }
 
   char MoveToNextChar() {
