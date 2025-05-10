@@ -70,6 +70,11 @@
     Console.WriteLine("[line " + line + "] Error" + where + ": " + message);
     hadError = true;
   }
+
+  public static void ReportRuntimeError(RuntimeError error) {
+    Console.WriteLine(error.message + "\n[line " + error.token.line + "]");
+    hadRuntimeError = true;
+  }
 }
 
 enum ExitCode : int {
