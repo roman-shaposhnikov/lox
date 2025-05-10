@@ -1,4 +1,13 @@
 class Interpreter : AstVisitor<object?> {
+  public void Interpret(Expression expression) { 
+    try {
+      object? value = Evaluate(expression);
+      Console.WriteLine(Stringify(value));
+    } catch (RuntimeError error) {
+      Lox.ReportRuntimeError(error);
+    }
+  }
+
   object? Evaluate(Expression expression) {
     return expression.Accept(this);
   }
@@ -11,22 +20,60 @@ class Interpreter : AstVisitor<object?> {
     var left = Evaluate(expression.left);
     var right = Evaluate(expression.right);
 
-    return expression.oper.type switch {
-      TokenType.MINUS => (float)left - (float)right,
-      TokenType.SLASH => (float)left / (float)right,
-      TokenType.STAR => (float)left * (float)right,
-      TokenType.PLUS => HandlePlusOperator(left, right),
-      TokenType.GREATER => (float)left > (float)right,
-      TokenType.GREATER_EQUAL => (float)left >= (float)right,
-      TokenType.LESS => (float)left < (float)right,
-      TokenType.LESS_EQUAL => (float)left <= (float)right,
-      TokenType.BANG_EQUAL => !IsEqual(left, right),
-      TokenType.EQUAL_EQUAL => IsEqual(left, right),
-      _ => null,
-    };
+    switch (expression.oper.type) {
+      case TokenType.MINUS: {
+        CheckNumberOperands(expression.oper, left, right);
+
+       return (float)left - (float)right;
+      }
+      case TokenType.SLASH: {
+        CheckNumberOperands(expression.oper, left, right);
+
+        return (float)left / (float)right;
+      }
+      case TokenType.STAR: {
+        CheckNumberOperands(expression.oper, left, right);
+
+        return (float)left * (float)right;
+      }
+      case TokenType.PLUS: {
+        return HandlePlusOperator(expression.oper, left, right);
+      }
+      case TokenType.GREATER: {
+        CheckNumberOperands(expression.oper, left, right);
+
+        return (float)left > (float)right;
+      }
+      case TokenType.GREATER_EQUAL: {
+        CheckNumberOperands(expression.oper, left, right);
+
+        return (float)left >= (float)right;
+      }
+      case TokenType.LESS: {
+        CheckNumberOperands(expression.oper, left, right);
+
+        return (float)left < (float)right;
+      }
+      case TokenType.LESS_EQUAL: {
+        CheckNumberOperands(expression.oper, left, right);
+
+        return (float)left <= (float)right;
+      }
+      case TokenType.BANG_EQUAL: {
+        CheckNumberOperands(expression.oper, left, right);
+
+        return !IsEqual(left, right);
+      }
+      case TokenType.EQUAL_EQUAL: {
+        return IsEqual(left, right);
+      }
+      default: {
+        return  null;
+      }
+    }
   }
 
-  object? HandlePlusOperator(object? left, object? right) {
+  object? HandlePlusOperator(Token oper, object? left, object? right) {
     if (left is float floatLeft && right is float floatRight) {
       return floatLeft + floatRight;
     } 
@@ -35,17 +82,25 @@ class Interpreter : AstVisitor<object?> {
       return stringLeft + stringRight;
     }
 
-    return null;
+    throw new RuntimeError(oper, "Operands must be two numbers or two strings.");
   }
 
   public object? VisitUnaryExpression(Unary expression) {
     var right = Evaluate(expression.right);
 
-    return expression.oper.type switch {
-      TokenType.MINUS => -(float)right,
-      TokenType.BANG => !IsTruthy(right),
-      _ => null,
-    };
+    switch (expression.oper.type) {
+      case TokenType.MINUS: {
+        CheckNumberOperand(expression.oper, right);
+
+        return -(float)right;
+      }
+      case TokenType.BANG: {
+        return !IsTruthy(right);
+      }
+      default: {
+        return null;
+      }
+    }
   }
 
   public object? VisitLiteralExpression(Literal expression) {
@@ -74,5 +129,34 @@ class Interpreter : AstVisitor<object?> {
     }
 
     return left.Equals(right);
+  }
+
+  void CheckNumberOperands(Token oper, object? left, object? right) {
+    if (left is not float || right is not float) {
+      throw new RuntimeError(oper, "Operands must be numbers.");
+    }
+  }
+
+  void CheckNumberOperand(Token oper, object? operand) {
+    if (operand is not float) {
+      throw new RuntimeError(oper, "Operand must be a number.");
+    }
+  }
+
+  string Stringify(object? value) {
+    if (value is null) {
+      return "nil";
+    }
+
+    if (value is float floatValue) {
+      string text = floatValue.ToString();
+      if (text.EndsWith(".0")) {
+        text = text.Substring(0, text.Length - 2);
+      }
+
+      return text;
+    }
+
+    return value.ToString();
   }
 }
