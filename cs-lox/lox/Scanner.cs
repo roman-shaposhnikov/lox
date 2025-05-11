@@ -154,7 +154,9 @@ class Scanner(string source) {
     MoveToNextChar();
 
     // Trim the surrounding quotes.
-    string value = source.Substring(startScanningIndex + 1, currentCharIndex - 1);
+    var valueLength = currentCharIndex - startScanningIndex - 2;
+    var startValueIndex = startScanningIndex + 1; // Skip opening quote.
+    string value = source.Substring(startValueIndex, valueLength);
     AddToken(TokenType.STRING, value);
   }
 
