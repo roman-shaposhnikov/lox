@@ -4,12 +4,35 @@ class Parser(Token[] tokens) {
   readonly Token[] tokens = tokens;
   int currentTokenIndex = 0;
 
-  public Expression? Parse() {
-    try {
-      return ParseExpression();
-    } catch (ParseError) {
-      return null;
+  public Statement[] Parse() {
+    List<Statement> statements = [];
+    while (!IsAtEnd()) {
+      statements.Add(ParseStatement());
     }
+
+    return statements.ToArray();
+  }
+
+  Statement ParseStatement() {
+    if (MoveToNextIfMatchOneOf(TokenType.PRINT)) {
+      return ParsePrintStatement();
+    }
+
+    return ParseExpressionStatement();
+  }
+
+  Statement ParsePrintStatement() {
+    var value = ParseExpression();
+    ReportErrorIfNotMatch(TokenType.SEMICOLON, "Expect ';' after value.");
+
+    return new Print(value);
+  }
+
+  Statement ParseExpressionStatement() {
+    var expression = ParseExpression();
+    ReportErrorIfNotMatch(TokenType.SEMICOLON, "Expect ';' after expression.");
+
+    return new ExpressionStatement(expression);
   }
 
   Expression ParseExpression() {
