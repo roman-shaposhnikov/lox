@@ -10,6 +10,7 @@ expressionsNodesDescription=(
   "Grouping : ${EXPRESSION_BASE_CLASS_NAME} expression "
   "Literal : object? value "
   "Unary : Token oper , ${EXPRESSION_BASE_CLASS_NAME} right"
+  "Variable : Token name"
 )
 
 generateAst $TARGET_DIR $EXPRESSION_BASE_CLASS_NAME "${expressionsNodesDescription[@]}"
