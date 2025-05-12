@@ -1,4 +1,4 @@
-class Interpreter : AstVisitor<object?> {
+class Interpreter : ExpressionNodeVisitor<object?> {
   public void Interpret(Expression expression) { 
     try {
       object? value = Evaluate(expression);

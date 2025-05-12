@@ -4,7 +4,7 @@
 // ####  Check: cs-lox/tools/generateAst.sh  ####
 // ##############################################
 
-interface AstVisitor<ReturnValue> {
+interface ExpressionNodeVisitor<ReturnValue> {
   ReturnValue VisitGroupingExpression(Grouping expression);
   ReturnValue VisitBinaryExpression(Binary expression);
   ReturnValue VisitUnaryExpression(Unary expression);
@@ -12,14 +12,14 @@ interface AstVisitor<ReturnValue> {
 }
 
 abstract class Expression {
-  public abstract ReturnType Accept<ReturnType>(AstVisitor<ReturnType> visitor);
+  public abstract ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor);
 }
 
 class Grouping(
   Expression expression
 ) : Expression {
   public readonly Expression expression = expression;
-  public override ReturnType Accept<ReturnType>(AstVisitor<ReturnType> visitor) {
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitGroupingExpression(this);
   }
 }
@@ -32,7 +32,7 @@ class Binary(
   public readonly Expression left = left;
   public readonly Token oper = oper;
   public readonly Expression right = right;
-  public override ReturnType Accept<ReturnType>(AstVisitor<ReturnType> visitor) {
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitBinaryExpression(this);
   }
 }
@@ -43,7 +43,7 @@ class Unary(
 ) : Expression {
   public readonly Token oper = oper;
   public readonly Expression right = right;
-  public override ReturnType Accept<ReturnType>(AstVisitor<ReturnType> visitor) {
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitUnaryExpression(this);
   }
 }
@@ -52,7 +52,7 @@ class Literal(
   object? value
 ) : Expression {
   public readonly object? value = value;
-  public override ReturnType Accept<ReturnType>(AstVisitor<ReturnType> visitor) {
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitLiteralExpression(this);
   }
 }
