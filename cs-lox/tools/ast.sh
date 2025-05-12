@@ -1,11 +1,13 @@
+source "./lib.sh"
+
 # @type { (outputDir: string, fileName: string, ...nodesDescription: string[]) => void }
 function generateAst {
   local outputDir=$1
-  local fileName=$2
+  local baseClassName=$2
   local nodesDescription=("${@:3}")
 
   mkdir -p $outputDir
-  local filePath="${outputDir}/${fileName}.cs"
+  local filePath="${outputDir}/${baseClassName}.cs"
   touch $filePath
   clearFile $filePath
 
@@ -25,10 +27,10 @@ function generateAst {
 
   nodesClassNames="${!splitNodesDescription[@]}"
 
-  defineVisitor $filePath "${nodesClassNames[@]}"
+  defineVisitor $filePath $baseClassName "${nodesClassNames[@]}"
 
   appendLine $filePath
-  defineBaseNodeClass $filePath
+  defineBaseNodeClass $filePath $baseClassName
 
   for className in "${!splitNodesDescription[@]}"; do
     local solidFields="${splitNodesDescription[$className]}"
@@ -36,7 +38,7 @@ function generateAst {
     IFS=',' read -ra fields <<< "$solidFields"
 
     appendLine $filePath
-    defineNode $filePath $className "${fields[@]}"
+    defineNode $filePath $className $baseClassName "${fields[@]}"
   done
 }
 
@@ -54,12 +56,18 @@ function defineDisclaimer {
 # @type { (filePath: string, ...nodesClassNames: string[]) => void }
 function defineVisitor {
   local filePath=$1
-  local nodesClassNames=("${@:2}")
+  local baseClassName=$2
+  local nodesClassNames=("${@:3}")
 
-  appendLine $filePath "interface AstVisitor<ReturnValue> {"
+  appendLine $filePath "interface ${baseClassName}NodeVisitor<ReturnValue> {"
 
+  local argumentName=$(toLowerCase $baseClassName)
   for className in ${nodesClassNames[@]}; do
-    appendLine $filePath "  ReturnValue Visit${className}Expression(${className} expression);"
+    if [[ $className == *$baseClassName ]]; then
+      appendLine $filePath "  ReturnValue Visit${className}(${className} ${argumentName});"
+    else
+      appendLine $filePath "  ReturnValue Visit${className}${baseClassName}(${className} ${argumentName});"
+    fi
   done
 
   appendLine $filePath "}"
@@ -68,9 +76,10 @@ function defineVisitor {
 # @type { (filePath: string) => void }
 function defineBaseNodeClass {
   local filePath=$1
+  local baseClassName=$2
 
-  appendLine $filePath "abstract class ${BASE_CLASS_NAME} {"
-  appendLine $filePath "  public abstract ReturnType Accept<ReturnType>(AstVisitor<ReturnType> visitor);"
+  appendLine $filePath "abstract class ${baseClassName} {"
+  appendLine $filePath "  public abstract ReturnType Accept<ReturnType>(${baseClassName}NodeVisitor<ReturnType> visitor);"
   appendLine $filePath "}"
 }
 
@@ -78,7 +87,8 @@ function defineBaseNodeClass {
 function defineNode {
   local filePath=$1
   local className=$2
-  local fields=("${@:3}")
+  local baseClassName=$3
+  local fields=("${@:4}")
 
   appendLine $filePath "class ${className}("
 
@@ -94,7 +104,7 @@ function defineNode {
     fi
   done
 
-  appendLine $filePath ") : ${BASE_CLASS_NAME} {"
+  appendLine $filePath ") : ${baseClassName} {"
 
   for field in "${fields[@]}"; do
     local parts
@@ -104,8 +114,14 @@ function defineNode {
     appendLine $filePath "  public readonly ${type} ${name} = ${name};"
   done
 
-  appendLine $filePath "  public override ReturnType Accept<ReturnType>(AstVisitor<ReturnType> visitor) {"
-  appendLine $filePath "    return visitor.Visit${className}Expression(this);"
+  appendLine $filePath "  public override ReturnType Accept<ReturnType>(${baseClassName}NodeVisitor<ReturnType> visitor) {"
+
+  if [[ $className == *$baseClassName ]]; then
+    appendLine $filePath "    return visitor.Visit${className}(this);"
+  else
+    appendLine $filePath "    return visitor.Visit${className}${baseClassName}(this);"
+  fi
+
   appendLine $filePath "  }"
 
   appendLine $filePath "}"

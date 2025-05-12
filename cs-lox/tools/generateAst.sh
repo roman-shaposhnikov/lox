@@ -1,6 +1,5 @@
 #!/bin/bash
 
-source "./lib.sh"
 source "./ast.sh"
 
 BASE_CLASS_NAME="Expression"

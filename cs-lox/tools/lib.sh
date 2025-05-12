@@ -29,3 +29,9 @@ function splitBy {
 
   IFS=$delimiter read -ra outArray <<< "$string"
 }
+
+function toLowerCase {
+  local source=$1
+
+  echo "$source" | tr '[:upper:]' '[:lower:]'
+}
