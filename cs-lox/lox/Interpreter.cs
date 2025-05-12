@@ -1,4 +1,6 @@
 class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidType> {
+  readonly EnvironmentRecord environment = new();
+
   public void Interpret(Statement[] statements) { 
     try {
       foreach (Statement statement in statements) {
@@ -22,6 +24,21 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     Console.WriteLine(Stringify(value));
 
     return new VoidType();
+  }
+
+  public VoidType VisitVarStatement(Var statement) {
+    object? value = null;
+    if (statement.initializer is not null) {
+      value = statement.initializer;
+    }
+
+    environment.Define(statement.name.lexeme, value);
+
+    return new();
+  }
+
+  public object? VisitVariableExpression(Variable expression) {
+    return environment.Get(expression.name);
   }
 
   public VoidType VisitExpressionStatement(ExpressionStatement statement) {
