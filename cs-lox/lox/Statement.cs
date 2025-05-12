@@ -7,6 +7,7 @@
 interface StatementNodeVisitor<ReturnValue> {
   ReturnValue VisitPrintStatement(Print statement);
   ReturnValue VisitExpressionStatement(ExpressionStatement statement);
+  ReturnValue VisitVarStatement(Var statement);
 }
 
 abstract class Statement {
@@ -28,5 +29,16 @@ class ExpressionStatement(
   public readonly Expression expression = expression;
   public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
     return visitor.VisitExpressionStatement(this);
+  }
+}
+
+class Var(
+  Token name,
+  Expression? initializer
+) : Statement {
+  public readonly Token name = name;
+  public readonly Expression? initializer = initializer;
+  public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitVarStatement(this);
   }
 }
