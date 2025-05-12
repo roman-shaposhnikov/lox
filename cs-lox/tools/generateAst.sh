@@ -18,6 +18,7 @@ STATEMENT_BASE_CLASS_NAME="Statement"
 statementsNodesDescription=(
   "ExpressionStatement : ${EXPRESSION_BASE_CLASS_NAME} expression"
   "Print : ${EXPRESSION_BASE_CLASS_NAME} expression"
+  "Var : Token name, ${EXPRESSION_BASE_CLASS_NAME}? initializer"
 )
 
 generateAst $TARGET_DIR $STATEMENT_BASE_CLASS_NAME "${statementsNodesDescription[@]}"
