@@ -1,6 +1,7 @@
 ﻿class Lox {
   static public Boolean hadError = false;
   static public Boolean hadRuntimeError = false;
+  static readonly Interpreter interpreter = new();
 
   static void Main(string[] args) {
     if (args.Length > 1) {
@@ -48,10 +49,14 @@
   static void Run(string source) {
     var scanner = new Scanner(source);
     var tokens = scanner.ProduceTokens();
+    var parser = new Parser([.. tokens]);
+    var expression = parser.Parse();
 
-    tokens.ForEach((token) => {
-      Console.WriteLine(token);
-    });
+    if (hadError) {
+      return;
+    }
+
+    interpreter.Interpret(expression);
   }
 
   public static void Error(int line, string message) {
