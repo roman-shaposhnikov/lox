@@ -1,8 +1,9 @@
-class Interpreter : ExpressionNodeVisitor<object?> {
-  public void Interpret(Expression expression) { 
+class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidType> {
+  public void Interpret(Statement[] statements) { 
     try {
-      object? value = Evaluate(expression);
-      Console.WriteLine(Stringify(value));
+      foreach (Statement statement in statements) {
+        Execute(statement);
+      }
     } catch (RuntimeError error) {
       Lox.ReportRuntimeError(error);
     }
@@ -10,6 +11,23 @@ class Interpreter : ExpressionNodeVisitor<object?> {
 
   object? Evaluate(Expression expression) {
     return expression.Accept(this);
+  }
+
+  void Execute(Statement statement) {
+    statement.Accept(this);
+  }
+
+  public VoidType VisitPrintStatement(Print statement) {
+    var value = Evaluate(statement.expression);
+    Console.WriteLine(Stringify(value));
+
+    return new VoidType();
+  }
+
+  public VoidType VisitExpressionStatement(ExpressionStatement statement) {
+    Evaluate(statement.expression);
+
+    return new VoidType();
   }
 
   public object? VisitGroupingExpression(Grouping expression) {
