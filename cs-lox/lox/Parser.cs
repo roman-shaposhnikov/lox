@@ -4,13 +4,39 @@ class Parser(Token[] tokens) {
   readonly Token[] tokens = tokens;
   int currentTokenIndex = 0;
 
-  public Statement[] Parse() {
-    List<Statement> statements = [];
+  public Statement?[] Parse() {
+    List<Statement?> statements = [];
     while (!IsAtEnd()) {
-      statements.Add(ParseStatement());
+      statements.Add(ParseDeclaration());
     }
 
     return statements.ToArray();
+  }
+
+  Statement? ParseDeclaration() {
+    try {
+    if (MoveToNextIfMatchOneOf(TokenType.VAR)) {
+        return ParseVarDeclaration();
+      }
+
+      return ParseStatement();
+    } catch (ParseError) {
+      Synchronize();
+      return null;
+    }
+  }
+
+  Statement ParseVarDeclaration() {
+    Token name = ReportErrorIfNotMatch(TokenType.IDENTIFIER, "Expect variable name.");
+
+    Expression? initializer = null;
+    if (MoveToNextIfMatchOneOf(TokenType.EQUAL)) {
+      initializer = ParseExpression();
+    }
+
+    ReportErrorIfNotMatch(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+
+    return new Var(name, initializer);
   }
 
   Statement ParseStatement() {
@@ -130,6 +156,10 @@ class Parser(Token[] tokens) {
 
     if (MoveToNextIfMatchOneOf(TokenType.NUMBER, TokenType.STRING)) {
       return new Literal(PeekPreviousToken().literal);
+    }
+
+    if (MoveToNextIfMatchOneOf(TokenType.IDENTIFIER)) {
+      return new Variable(PeekPreviousToken());
     }
 
     if (MoveToNextIfMatchOneOf(TokenType.LEFT_PAREN)) {
