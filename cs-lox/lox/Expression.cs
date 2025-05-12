@@ -8,6 +8,7 @@ interface ExpressionNodeVisitor<ReturnValue> {
   ReturnValue VisitGroupingExpression(Grouping expression);
   ReturnValue VisitBinaryExpression(Binary expression);
   ReturnValue VisitUnaryExpression(Unary expression);
+  ReturnValue VisitVariableExpression(Variable expression);
   ReturnValue VisitLiteralExpression(Literal expression);
 }
 
@@ -45,6 +46,15 @@ class Unary(
   public readonly Expression right = right;
   public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitUnaryExpression(this);
+  }
+}
+
+class Variable(
+  Token name
+) : Expression {
+  public readonly Token name = name;
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitVariableExpression(this);
   }
 }
 
