@@ -2,6 +2,8 @@
 
 source "./ast.sh"
 
+TARGET_DIR="../lox"
+
 EXPRESSION_BASE_CLASS_NAME="Expression"
 expressionsNodesDescription=(
   "Binary : ${EXPRESSION_BASE_CLASS_NAME} left , Token oper, ${EXPRESSION_BASE_CLASS_NAME} right"
@@ -10,7 +12,7 @@ expressionsNodesDescription=(
   "Unary : Token oper , ${EXPRESSION_BASE_CLASS_NAME} right"
 )
 
-generateAst "../lox" "${EXPRESSION_BASE_CLASS_NAME}" "${expressionsNodesDescription[@]}"
+generateAst $TARGET_DIR $EXPRESSION_BASE_CLASS_NAME "${expressionsNodesDescription[@]}"
 
 STATEMENT_BASE_CLASS_NAME="Statement"
 statementsNodesDescription=(
@@ -18,4 +20,4 @@ statementsNodesDescription=(
   "Print : ${EXPRESSION_BASE_CLASS_NAME} expression"
 )
 
-generateAst "../lox" "${STATEMENT_BASE_CLASS_NAME}" "${statementsNodesDescription[@]}"
+generateAst $TARGET_DIR $STATEMENT_BASE_CLASS_NAME "${statementsNodesDescription[@]}"
