@@ -37,6 +37,13 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     return new();
   }
 
+  public object? VisitAssignExpression(Assign expression) {
+    var value = Evaluate(expression.value);
+    environment.Assign(expression.name, value);
+
+    return value;
+  }
+
   public object? VisitVariableExpression(Variable expression) {
     return environment.Get(expression.name);
   }
