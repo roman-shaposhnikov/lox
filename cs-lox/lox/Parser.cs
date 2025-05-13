@@ -62,7 +62,26 @@ class Parser(Token[] tokens) {
   }
 
   Expression ParseExpression() {
-    return ParseEquality();
+    return ParseAssignment();
+  }
+
+  Expression ParseAssignment() {
+    Expression expression = ParseEquality();
+
+    if (MoveToNextIfMatchOneOf(TokenType.EQUAL)) {
+      Token equals = PeekPreviousToken();
+      Expression value = ParseAssignment();
+
+      if (expression is Variable) {
+        Token name = ((Variable)expression).name;
+
+        return new Assign(name, value);
+      }
+
+      CreateParseError(equals, "Invalid assignment target."); 
+    }
+
+    return expression;
   }
 
   Expression ParseEquality() {
