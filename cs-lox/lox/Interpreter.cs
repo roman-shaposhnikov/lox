@@ -29,7 +29,7 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
   public VoidType VisitVarStatement(Var statement) {
     object? value = null;
     if (statement.initializer is not null) {
-      value = statement.initializer;
+      value = Evaluate(statement.initializer);
     }
 
     environment.Define(statement.name.lexeme, value);
