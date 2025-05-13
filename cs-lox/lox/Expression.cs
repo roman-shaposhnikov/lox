@@ -7,6 +7,7 @@
 interface ExpressionNodeVisitor<ReturnValue> {
   ReturnValue VisitGroupingExpression(Grouping expression);
   ReturnValue VisitBinaryExpression(Binary expression);
+  ReturnValue VisitAssignExpression(Assign expression);
   ReturnValue VisitUnaryExpression(Unary expression);
   ReturnValue VisitVariableExpression(Variable expression);
   ReturnValue VisitLiteralExpression(Literal expression);
@@ -35,6 +36,17 @@ class Binary(
   public readonly Expression right = right;
   public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitBinaryExpression(this);
+  }
+}
+
+class Assign(
+  Token name,
+  Expression value
+) : Expression {
+  public readonly Token name = name;
+  public readonly Expression value = value;
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitAssignExpression(this);
   }
 }
 
