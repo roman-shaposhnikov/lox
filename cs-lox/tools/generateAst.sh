@@ -6,6 +6,7 @@ TARGET_DIR="../lox"
 
 EXPRESSION_BASE_CLASS_NAME="Expression"
 expressionsNodesDescription=(
+  "Assign : Token name, ${EXPRESSION_BASE_CLASS_NAME} value"
   "Binary : ${EXPRESSION_BASE_CLASS_NAME} left , Token oper, ${EXPRESSION_BASE_CLASS_NAME} right"
   "Grouping : ${EXPRESSION_BASE_CLASS_NAME} expression "
   "Literal : object? value "
