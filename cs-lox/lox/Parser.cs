@@ -44,6 +44,10 @@ class Parser(Token[] tokens) {
       return ParsePrintStatement();
     }
 
+    if (MoveToNextIfMatchOneOf(TokenType.LEFT_BRACE)) {
+      return new Block(ParseBlock());
+    }
+
     return ParseExpressionStatement();
   }
 
@@ -59,6 +63,22 @@ class Parser(Token[] tokens) {
     ReportErrorIfNotMatch(TokenType.SEMICOLON, "Expect ';' after expression.");
 
     return new ExpressionStatement(expression);
+  }
+
+  Statement[] ParseBlock() {
+    List<Statement> statements = [];
+
+    while (!CurrentTokenIsTypeOf(TokenType.RIGHT_BRACE) && !IsAtEnd()) {
+      var declaration = ParseDeclaration();
+
+      if (declaration is not null) {
+        statements.Add(declaration);
+      }
+    }
+
+    ReportErrorIfNotMatch(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+
+    return statements.ToArray();
   }
 
   Expression ParseExpression() {
