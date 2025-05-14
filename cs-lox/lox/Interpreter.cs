@@ -1,5 +1,5 @@
 class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidType> {
-  readonly EnvironmentRecord environment = new();
+  EnvironmentRecord environment = new();
 
   public void Interpret(Statement[] statements) { 
     try {
@@ -17,6 +17,26 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
 
   void Execute(Statement statement) {
     statement.Accept(this);
+  }
+
+  public VoidType VisitBlockStatement(Block statement) {
+    ExecuteBlock(statement.statements, new EnvironmentRecord(environment));
+
+    return new VoidType();
+  }
+
+  void ExecuteBlock(Statement[] statements, EnvironmentRecord environment) {
+    EnvironmentRecord previous = this.environment;
+
+    try {
+      this.environment = environment;
+
+      foreach (Statement statement in statements) {
+        Execute(statement);
+      }
+    } finally {
+      this.environment = previous;
+    }
   }
 
   public VoidType VisitPrintStatement(Print statement) {
