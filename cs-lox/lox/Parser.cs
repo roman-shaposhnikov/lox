@@ -39,6 +39,16 @@ class Parser(Token[] tokens) {
     return new Var(name, initializer);
   }
 
+  Statement ParseWhileStatement() {
+    ReportErrorIfNotMatch(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+    Expression condition = ParseExpression();
+    ReportErrorIfNotMatch(TokenType.RIGHT_PAREN, "Expect ')' after while condition.");
+
+    Statement body = ParseStatement();
+
+    return new While(condition, body);
+  }
+
   Statement ParseStatement() {
     if (MoveToNextIfMatchOneOf(TokenType.IF)) {
       return ParseIfStatement();
@@ -46,6 +56,10 @@ class Parser(Token[] tokens) {
 
     if (MoveToNextIfMatchOneOf(TokenType.PRINT)) {
       return ParsePrintStatement();
+    }
+
+    if (MoveToNextIfMatchOneOf(TokenType.WHILE)) {
+      return ParseWhileStatement();
     }
 
     if (MoveToNextIfMatchOneOf(TokenType.LEFT_BRACE)) {
