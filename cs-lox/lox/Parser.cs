@@ -50,6 +50,10 @@ class Parser(Token[] tokens) {
   }
 
   Statement ParseStatement() {
+    if (MoveToNextIfMatchOneOf(TokenType.FOR)) {
+      return ParseForStatement();
+    }
+
     if (MoveToNextIfMatchOneOf(TokenType.IF)) {
       return ParseIfStatement();
     }
@@ -67,6 +71,48 @@ class Parser(Token[] tokens) {
     }
 
     return ParseExpressionStatement();
+  }
+
+  Statement ParseForStatement() {
+    ReportErrorIfNotMatch(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+
+    Statement? initializer = null;
+    if (MoveToNextIfMatchOneOf(TokenType.SEMICOLON)) {
+      initializer = null;
+    } else if (MoveToNextIfMatchOneOf(TokenType.VAR)) {
+      initializer = ParseVarDeclaration();
+    } else {
+      initializer = ParseExpressionStatement();
+    }
+
+    Expression? condition = null;
+    if (!CurrentTokenIsTypeOf(TokenType.SEMICOLON)) {
+      condition = ParseExpression();
+    }
+
+    ReportErrorIfNotMatch(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+    Expression? increment = null;
+    if (!CurrentTokenIsTypeOf(TokenType.RIGHT_PAREN)) {
+      increment = ParseExpression();
+    }
+
+    ReportErrorIfNotMatch(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+    Statement body = ParseStatement();
+
+    if (increment is not null) {
+      body = new Block([body, new ExpressionStatement(increment)]);
+    }
+
+    condition ??= new Literal(true);
+    body = new While(condition, body);
+
+    if (initializer is not null) {
+      body = new Block([initializer, body]);
+    }
+
+    return body;
   }
 
   Statement ParseIfStatement() {
