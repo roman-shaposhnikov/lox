@@ -180,6 +180,22 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     return expression.value;
   }
 
+  public object? VisitLogicalExpression(Logical expression) {
+    var left = Evaluate(expression.left);
+
+    if (expression.oper.type == TokenType.OR) {
+      if (IsTruthy(left)) {
+        return left;
+      }
+    } else {
+      if (!IsTruthy(left)) {
+        return left;
+      }
+    }
+
+    return Evaluate(expression.right);
+  }
+
   bool IsTruthy(object? value) {
     if (value == null) {
       return false;
