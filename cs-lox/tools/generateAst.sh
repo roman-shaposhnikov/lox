@@ -20,6 +20,7 @@ STATEMENT_BASE_CLASS_NAME="Statement"
 statementsNodesDescription=(
   "Block : ${STATEMENT_BASE_CLASS_NAME}[] statements"
   "ExpressionStatement : ${EXPRESSION_BASE_CLASS_NAME} expression"
+  "If : Expression, ${STATEMENT_BASE_CLASS_NAME} thenBranch, ${STATEMENT_BASE_CLASS_NAME}? elseBranch"
   "Print : ${EXPRESSION_BASE_CLASS_NAME} expression"
   "Var : Token name, ${EXPRESSION_BASE_CLASS_NAME}? initializer"
 )
