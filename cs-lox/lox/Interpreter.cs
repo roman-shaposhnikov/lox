@@ -74,6 +74,17 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     return new VoidType();
   }
 
+  public VoidType VisitIfStatement(If statement) {
+    var condition = Evaluate(statement.condition);
+    if (IsTruthy(condition)) {
+      Execute(statement.thenBranch);
+    } else if (statement.elseBranch is not null) {
+      Execute(statement.elseBranch);
+    }
+
+    return new VoidType();
+  }
+
   public object? VisitGroupingExpression(Grouping expression) {
     return Evaluate(expression.expression);
   }
