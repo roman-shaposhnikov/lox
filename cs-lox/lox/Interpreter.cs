@@ -57,6 +57,14 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     return new();
   }
 
+  public VoidType VisitWhileStatement(While statement) {
+    while (IsTruthy(Evaluate(statement.condition))) {
+      Execute(statement.body);
+    }
+
+    return new VoidType();
+  }
+
   public object? VisitAssignExpression(Assign expression) {
     var value = Evaluate(expression.value);
     environment.Assign(expression.name, value);
