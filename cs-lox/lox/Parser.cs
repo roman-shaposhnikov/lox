@@ -104,7 +104,7 @@ class Parser(Token[] tokens) {
   }
 
   Expression ParseAssignment() {
-    Expression expression = ParseEquality();
+    Expression expression = ParseOrExpression();
 
     if (MoveToNextIfMatchOneOf(TokenType.EQUAL)) {
       Token equals = PeekPreviousToken();
@@ -117,6 +117,30 @@ class Parser(Token[] tokens) {
       }
 
       CreateParseError(equals, "Invalid assignment target."); 
+    }
+
+    return expression;
+  }
+
+  Expression ParseOrExpression() {
+    Expression expression = ParseAndExpression();
+
+    while (MoveToNextIfMatchOneOf(TokenType.OR)) {
+      Token oper = PeekPreviousToken();
+      Expression right = ParseAndExpression();
+      expression = new Logical(expression, oper, right);
+    } 
+
+    return expression;
+  }
+
+  Expression ParseAndExpression() {
+    Expression expression = ParseEquality();
+
+    while (MoveToNextIfMatchOneOf(TokenType.AND)) {
+      Token oper = PeekPreviousToken();
+      Expression right = ParseEquality();
+      expression = new Logical(expression, oper, right);
     }
 
     return expression;
