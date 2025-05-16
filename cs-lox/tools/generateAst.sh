@@ -10,6 +10,7 @@ expressionsNodesDescription=(
   "Binary : ${EXPRESSION_BASE_CLASS_NAME} left , Token oper, ${EXPRESSION_BASE_CLASS_NAME} right"
   "Grouping : ${EXPRESSION_BASE_CLASS_NAME} expression "
   "Literal : object? value "
+  "Logical : ${EXPRESSION_BASE_CLASS_NAME} left, Token oper, ${EXPRESSION_BASE_CLASS_NAME} right"
   "Unary : Token oper , ${EXPRESSION_BASE_CLASS_NAME} right"
   "Variable : Token name"
 )
