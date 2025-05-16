@@ -6,6 +6,7 @@
 
 interface StatementNodeVisitor<ReturnValue> {
   ReturnValue VisitPrintStatement(Print statement);
+  ReturnValue VisitIfStatement(If statement);
   ReturnValue VisitBlockStatement(Block statement);
   ReturnValue VisitExpressionStatement(ExpressionStatement statement);
   ReturnValue VisitVarStatement(Var statement);
@@ -21,6 +22,19 @@ class Print(
   public readonly Expression expression = expression;
   public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
     return visitor.VisitPrintStatement(this);
+  }
+}
+
+class If(
+  Expression,
+  Statement thenBranch,
+  Statement? elseBranch
+) : Statement {
+  public readonly Expression  = ;
+  public readonly Statement thenBranch = thenBranch;
+  public readonly Statement? elseBranch = elseBranch;
+  public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitIfStatement(this);
   }
 }
 
