@@ -40,6 +40,10 @@ class Parser(Token[] tokens) {
   }
 
   Statement ParseStatement() {
+    if (MoveToNextIfMatchOneOf(TokenType.IF)) {
+      return ParseIfStatement();
+    }
+
     if (MoveToNextIfMatchOneOf(TokenType.PRINT)) {
       return ParsePrintStatement();
     }
@@ -49,6 +53,20 @@ class Parser(Token[] tokens) {
     }
 
     return ParseExpressionStatement();
+  }
+
+  Statement ParseIfStatement() {
+    ReportErrorIfNotMatch(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+    Expression condition = ParseExpression();
+    ReportErrorIfNotMatch(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+    Statement thenBranch = ParseStatement();
+    Statement? elseBranch = null;
+    if (MoveToNextIfMatchOneOf(TokenType.ELSE)) {
+      elseBranch = ParseStatement();
+    }
+
+    return new If(condition, thenBranch, elseBranch);
   }
 
   Statement ParsePrintStatement() {

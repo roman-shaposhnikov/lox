@@ -26,11 +26,11 @@ class Print(
 }
 
 class If(
-  Expression,
+  Expression condition,
   Statement thenBranch,
   Statement? elseBranch
 ) : Statement {
-  public readonly Expression  = ;
+  public readonly Expression condition = condition;
   public readonly Statement thenBranch = thenBranch;
   public readonly Statement? elseBranch = elseBranch;
   public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
