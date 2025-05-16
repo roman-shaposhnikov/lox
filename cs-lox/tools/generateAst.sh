@@ -24,6 +24,7 @@ statementsNodesDescription=(
   "If : Expression condition, ${STATEMENT_BASE_CLASS_NAME} thenBranch, ${STATEMENT_BASE_CLASS_NAME}? elseBranch"
   "Print : ${EXPRESSION_BASE_CLASS_NAME} expression"
   "Var : Token name, ${EXPRESSION_BASE_CLASS_NAME}? initializer"
+  "While : Expression condition, ${STATEMENT_BASE_CLASS_NAME} body"
 )
 
 generateAst $TARGET_DIR $STATEMENT_BASE_CLASS_NAME "${statementsNodesDescription[@]}"
