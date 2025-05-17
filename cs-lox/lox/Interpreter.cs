@@ -166,6 +166,26 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     throw new RuntimeError(oper, "Operands must be two numbers or two strings.");
   }
 
+  public object? VisitCallExpression(Call expression) {
+    var callee = Evaluate(expression.callee);
+
+    List<object?> arguments = [];
+    foreach (Expression argument in expression.arguments) {
+      arguments.Add(Evaluate(argument));
+    }
+
+    if (callee is not LoxCallable) {
+      throw new RuntimeError(expression.paren, "Can only call functions and classes.");
+    }
+
+    var function = (LoxCallable)callee;
+    if (arguments.Count != function.Arity()) {
+      throw new RuntimeError(expression.paren, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
+    }
+
+    return function.Call(this, arguments.ToArray());
+  }
+
   public object? VisitUnaryExpression(Unary expression) {
     var right = Evaluate(expression.right);
 

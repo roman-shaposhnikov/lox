@@ -8,6 +8,7 @@ EXPRESSION_BASE_CLASS_NAME="Expression"
 expressionsNodesDescription=(
   "Assign : Token name, ${EXPRESSION_BASE_CLASS_NAME} value"
   "Binary : ${EXPRESSION_BASE_CLASS_NAME} left , Token oper, ${EXPRESSION_BASE_CLASS_NAME} right"
+  "Call : ${EXPRESSION_BASE_CLASS_NAME} callee, Token paren, ${EXPRESSION_BASE_CLASS_NAME}[] arguments"
   "Grouping : ${EXPRESSION_BASE_CLASS_NAME} expression "
   "Literal : object? value "
   "Logical : ${EXPRESSION_BASE_CLASS_NAME} left, Token oper, ${EXPRESSION_BASE_CLASS_NAME} right"

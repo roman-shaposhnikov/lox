@@ -281,7 +281,39 @@ class Parser(Token[] tokens) {
       return new Unary(oper, right);
     }
 
-    return ParsePrimary();
+    return ParseCall();
+  }
+
+  Expression ParseCall() {
+    Expression expression = ParsePrimary();
+
+    while (true) {
+      if (MoveToNextIfMatchOneOf(TokenType.LEFT_PAREN)) {
+        expression = ParseFinishCall(expression);
+      } else {
+        break;
+      }
+    }
+
+    return expression;
+  }
+
+  Expression ParseFinishCall(Expression callee) {
+    List<Expression> arguments = [];
+
+    if (!CurrentTokenIsTypeOf(TokenType.RIGHT_PAREN)) {
+      do {
+        if (arguments.Count > 4) {
+          CreateParseError(PeekCurrentToken(), "Can't have more than 4 arguments.");
+        }
+
+        arguments.Add(ParseExpression());
+      } while (MoveToNextIfMatchOneOf(TokenType.COMMA));
+    }
+
+    Token rightParen = ReportErrorIfNotMatch(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+
+    return new Call(callee, rightParen, arguments.ToArray());
   }
 
   Expression ParsePrimary() {
