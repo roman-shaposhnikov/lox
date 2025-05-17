@@ -5,6 +5,7 @@
 // ##############################################
 
 interface ExpressionNodeVisitor<ReturnValue> {
+  ReturnValue VisitCallExpression(Call expression);
   ReturnValue VisitGroupingExpression(Grouping expression);
   ReturnValue VisitBinaryExpression(Binary expression);
   ReturnValue VisitLogicalExpression(Logical expression);
@@ -16,6 +17,19 @@ interface ExpressionNodeVisitor<ReturnValue> {
 
 abstract class Expression {
   public abstract ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor);
+}
+
+class Call(
+  Expression callee,
+  Token paren,
+  Expression[] arguments
+) : Expression {
+  public readonly Expression callee = callee;
+  public readonly Token paren = paren;
+  public readonly Expression[] arguments = arguments;
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitCallExpression(this);
+  }
 }
 
 class Grouping(
