@@ -1,5 +1,13 @@
 class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidType> {
-  EnvironmentRecord environment = new();
+  EnvironmentRecord globals;
+  EnvironmentRecord environment;
+
+  public Interpreter() {
+    globals = new();
+    environment = globals;
+
+    globals.Define("clock", new ClockCallable());
+  }
 
   public void Interpret(Statement[] statements) { 
     try {
