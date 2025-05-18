@@ -90,6 +90,10 @@ class Parser(Token[] tokens) {
       return ParsePrintStatement();
     }
 
+    if (MoveToNextIfMatchOneOf(TokenType.RETURN)) {
+      return ParseReturnStatement();
+    }
+
     if (MoveToNextIfMatchOneOf(TokenType.WHILE)) {
       return ParseWhileStatement();
     }
@@ -162,6 +166,18 @@ class Parser(Token[] tokens) {
     ReportErrorIfNotMatch(TokenType.SEMICOLON, "Expect ';' after value.");
 
     return new Print(value);
+  }
+
+  Statement ParseReturnStatement() {
+    var keyword = PeekPreviousToken();
+    Expression? value = null;
+    if (!CurrentTokenIsTypeOf(TokenType.SEMICOLON)) {
+      value = ParseExpression();
+    }
+
+    ReportErrorIfNotMatch(TokenType.SEMICOLON, "Expect ';' after return value.");
+
+    return new Return(keyword, value);
   }
 
   Statement ParseExpressionStatement() {

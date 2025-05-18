@@ -54,6 +54,15 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     return new VoidType();
   }
 
+  public VoidType VisitReturnStatement(Return statement) {
+    object? value = null;
+    if (statement.value is not null) {
+      value = Evaluate(statement.value);
+    }
+
+    throw new ReturnException(value);
+  }
+
   public VoidType VisitVarStatement(Var statement) {
     object? value = null;
     if (statement.initializer is not null) {

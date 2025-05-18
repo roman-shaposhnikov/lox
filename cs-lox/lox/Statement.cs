@@ -6,6 +6,7 @@
 
 interface StatementNodeVisitor<ReturnValue> {
   ReturnValue VisitPrintStatement(Print statement);
+  ReturnValue VisitReturnStatement(Return statement);
   ReturnValue VisitIfStatement(If statement);
   ReturnValue VisitBlockStatement(Block statement);
   ReturnValue VisitExpressionStatement(ExpressionStatement statement);
@@ -24,6 +25,17 @@ class Print(
   public readonly Expression expression = expression;
   public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
     return visitor.VisitPrintStatement(this);
+  }
+}
+
+class Return(
+  Token keyword,
+  Expression? value
+) : Statement {
+  public readonly Token keyword = keyword;
+  public readonly Expression? value = value;
+  public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitReturnStatement(this);
   }
 }
 

@@ -14,7 +14,11 @@ class LoxFunction(Function declaration) : LoxCallable {
       );
     }
 
-    interpreter.ExecuteBlock(declaration.body, environment);
+    try {
+      interpreter.ExecuteBlock(declaration.body, environment);
+    } catch (ReturnException expression) {
+      return expression.value;
+    }
 
     return null;
   }
