@@ -100,7 +100,7 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
   }
 
   public VoidType VisitFunctionStatement(Function statement) {
-    var function = new LoxFunction(statement);
+    var function = new LoxFunction(statement, environment);
     environment.Define(statement.name.lexeme, function);
 
     return new VoidType();

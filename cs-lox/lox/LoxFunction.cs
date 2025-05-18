@@ -1,12 +1,13 @@
-class LoxFunction(Function declaration) : LoxCallable {
+class LoxFunction(Function declaration, EnvironmentRecord closure) : LoxCallable {
   readonly Function declaration = declaration;
+  readonly EnvironmentRecord closure = closure;
 
   public int Arity() {
     return declaration.parameters.Length;
   }
 
   public object? Call(Interpreter interpreter, object?[] arguments) {
-    var environment = new EnvironmentRecord(interpreter.globals);
+    var environment = new EnvironmentRecord(closure);
     for (int i = 0; i < declaration.parameters.Length; i++) {
       environment.Define(
         declaration.parameters.ElementAt(i).lexeme,
