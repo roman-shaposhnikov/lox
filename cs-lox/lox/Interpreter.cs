@@ -1,5 +1,5 @@
 class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidType> {
-  EnvironmentRecord globals;
+  public readonly EnvironmentRecord globals;
   EnvironmentRecord environment;
 
   public Interpreter() {
@@ -33,7 +33,7 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     return new VoidType();
   }
 
-  void ExecuteBlock(Statement[] statements, EnvironmentRecord environment) {
+  public void ExecuteBlock(Statement[] statements, EnvironmentRecord environment) {
     EnvironmentRecord previous = this.environment;
 
     try {
@@ -86,6 +86,13 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
 
   public VoidType VisitExpressionStatement(ExpressionStatement statement) {
     Evaluate(statement.expression);
+
+    return new VoidType();
+  }
+
+  public VoidType VisitFunctionStatement(Function statement) {
+    var function = new LoxFunction(statement);
+    environment.Define(statement.name.lexeme, function);
 
     return new VoidType();
   }

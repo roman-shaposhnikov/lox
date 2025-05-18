@@ -1,4 +1,4 @@
 interface LoxCallable {
   int Arity();
-  object Call(Interpreter interpreter, object?[] arguments);
+  object? Call(Interpreter interpreter, object?[] arguments);
 }

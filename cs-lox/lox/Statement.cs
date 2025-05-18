@@ -10,6 +10,7 @@ interface StatementNodeVisitor<ReturnValue> {
   ReturnValue VisitBlockStatement(Block statement);
   ReturnValue VisitExpressionStatement(ExpressionStatement statement);
   ReturnValue VisitWhileStatement(While statement);
+  ReturnValue VisitFunctionStatement(Function statement);
   ReturnValue VisitVarStatement(Var statement);
 }
 
@@ -65,6 +66,19 @@ class While(
   public readonly Statement body = body;
   public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
     return visitor.VisitWhileStatement(this);
+  }
+}
+
+class Function(
+  Token name,
+  Token[] parameters,
+  Statement[] body
+) : Statement {
+  public readonly Token name = name;
+  public readonly Token[] parameters = parameters;
+  public readonly Statement[] body = body;
+  public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitFunctionStatement(this);
   }
 }
 

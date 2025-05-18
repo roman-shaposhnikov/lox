@@ -15,6 +15,10 @@ class Parser(Token[] tokens) {
 
   Statement? ParseDeclaration() {
     try {
+      if (MoveToNextIfMatchOneOf(TokenType.FUN)) {
+        return ParseFunction("function");
+      }
+
     if (MoveToNextIfMatchOneOf(TokenType.VAR)) {
         return ParseVarDeclaration();
       }
@@ -24,6 +28,30 @@ class Parser(Token[] tokens) {
       Synchronize();
       return null;
     }
+  }
+
+  Function ParseFunction(String kind) {
+    Token name = ReportErrorIfNotMatch(TokenType.IDENTIFIER, $"Expect {kind} name.");
+
+    ReportErrorIfNotMatch(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+
+    List<Token> parameters = [];
+    if (!CurrentTokenIsTypeOf(TokenType.RIGHT_PAREN)) {
+      do {
+        if (parameters.Count >= 5) {
+          CreateParseError(PeekCurrentToken(), "Can't have more than 4 parameters.");
+        }
+
+        parameters.Add(ReportErrorIfNotMatch(TokenType.IDENTIFIER, "Expect parameter name."));
+      } while (MoveToNextIfMatchOneOf(TokenType.COMMA));
+    }
+
+    ReportErrorIfNotMatch(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+
+    ReportErrorIfNotMatch(TokenType.LEFT_BRACE, "Expect '{' before " + kind + " body.");
+    var body = ParseBlock();
+
+    return new Function(name, parameters.ToArray(), body);
   }
 
   Statement ParseVarDeclaration() {
