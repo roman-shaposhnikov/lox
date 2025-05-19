@@ -1,6 +1,7 @@
 class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidType> {
   public readonly EnvironmentRecord globals;
   EnvironmentRecord environment;
+  readonly Dictionary<Expression, int?> locals = [];
 
   public Interpreter() {
     globals = new();
@@ -25,6 +26,10 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
 
   void Execute(Statement statement) {
     statement.Accept(this);
+  }
+
+  public void Resolve(Expression expression, int depth) {
+    locals.Add(expression, depth);
   }
 
   public VoidType VisitBlockStatement(Block statement) {
@@ -84,13 +89,30 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
 
   public object? VisitAssignExpression(Assign expression) {
     var value = Evaluate(expression.value);
+
+    int? distance = locals[expression];
+    if (distance is not null) {
+      environment.AssignAt((int)distance, expression.name, value);
+    } else {
+      globals.Assign(expression.name, value);
+    }
+
     environment.Assign(expression.name, value);
 
     return value;
   }
 
   public object? VisitVariableExpression(Variable expression) {
-    return environment.Get(expression.name);
+    return lookUpVariable(expression.name, expression);
+  }
+
+  object? lookUpVariable(Token name, Expression expression) {
+    int? distance = locals[expression];
+    if (distance is not null) {
+      return environment.GetAt((int)distance, name.lexeme);
+    } else {
+      return globals.Get(name);
+    }
   }
 
   public VoidType VisitExpressionStatement(ExpressionStatement statement) {
