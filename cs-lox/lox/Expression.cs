@@ -6,6 +6,7 @@
 
 interface ExpressionNodeVisitor<ReturnValue> {
   ReturnValue VisitCallExpression(Call expression);
+  ReturnValue VisitSetExpression(Set expression);
   ReturnValue VisitGroupingExpression(Grouping expression);
   ReturnValue VisitBinaryExpression(Binary expression);
   ReturnValue VisitLogicalExpression(Logical expression);
@@ -13,6 +14,7 @@ interface ExpressionNodeVisitor<ReturnValue> {
   ReturnValue VisitUnaryExpression(Unary expression);
   ReturnValue VisitVariableExpression(Variable expression);
   ReturnValue VisitLiteralExpression(Literal expression);
+  ReturnValue VisitGetExpression(Get expression);
 }
 
 abstract class Expression {
@@ -29,6 +31,19 @@ class Call(
   public readonly Expression[] arguments = arguments;
   public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitCallExpression(this);
+  }
+}
+
+class Set(
+  Expression obj,
+  Token name,
+  Expression value
+) : Expression {
+  public readonly Expression obj = obj;
+  public readonly Token name = name;
+  public readonly Expression value = value;
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitSetExpression(this);
   }
 }
 
@@ -104,5 +119,16 @@ class Literal(
   public readonly object? value = value;
   public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitLiteralExpression(this);
+  }
+}
+
+class Get(
+  Expression obj,
+  Token name
+) : Expression {
+  public readonly Expression obj = obj;
+  public readonly Token name = name;
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitGetExpression(this);
   }
 }

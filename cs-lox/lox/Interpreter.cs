@@ -240,6 +240,15 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     return function.Call(this, arguments.ToArray());
   }
 
+  public object? VisitGetExpression(Get expression) {
+    object? obj = Evaluate(expression.obj);
+    if (obj is LoxInstance instance) {
+      return instance.Get(expression.name);
+    }
+
+    throw new RuntimeError(expression.name, "Only instances have properties.");
+  }
+
   public object? VisitUnaryExpression(Unary expression) {
     var right = Evaluate(expression.right);
 
@@ -276,6 +285,18 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     }
 
     return Evaluate(expression.right);
+  }
+
+  public object? VisitSetExpression(Set expression) {
+    var obj = Evaluate(expression.obj);
+    if (obj is not LoxInstance instance) {
+      throw new RuntimeError(expression.name, "Only instances have fields.");
+    }
+
+    var value = Evaluate(expression.value);
+    instance.Set(expression.name, value);
+
+    return value;
   }
 
   bool IsTruthy(object? value) {

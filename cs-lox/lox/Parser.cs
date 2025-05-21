@@ -236,6 +236,8 @@ class Parser(Token[] tokens) {
         Token name = ((Variable)expression).name;
 
         return new Assign(name, value);
+      } else if (expression is Get getExpression) {
+        return new Set(getExpression.obj, getExpression.name, value);
       }
 
       CreateParseError(equals, "Invalid assignment target."); 
@@ -352,6 +354,9 @@ class Parser(Token[] tokens) {
     while (true) {
       if (MoveToNextIfMatchOneOf(TokenType.LEFT_PAREN)) {
         expression = ParseFinishCall(expression);
+      } else if (MoveToNextIfMatchOneOf(TokenType.DOT)) {
+        Token name = ReportErrorIfNotMatch(TokenType.IDENTIFIER, "Expect property name after '.'.");
+        expression = new Get(expression, name);
       } else {
         break;
       }

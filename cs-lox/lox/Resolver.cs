@@ -124,6 +124,12 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
     return new();
   }
 
+  public VoidType VisitGetExpression(Get expression) {
+    Resolve(expression.obj);
+
+    return new();
+  }
+
   public VoidType VisitGroupingExpression(Grouping expression) {
     Resolve(expression.expression);
 
@@ -137,6 +143,13 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
   public VoidType VisitLogicalExpression(Logical expression) {
     Resolve(expression.left);
     Resolve(expression.right);
+
+    return new();
+  }
+
+  public VoidType VisitSetExpression(Set expression) {
+    Resolve(expression.value);
+    Resolve(expression.obj);
 
     return new();
   }

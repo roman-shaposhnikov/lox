@@ -9,9 +9,11 @@ expressionsNodesDescription=(
   "Assign : Token name, ${EXPRESSION_BASE_CLASS_NAME} value"
   "Binary : ${EXPRESSION_BASE_CLASS_NAME} left , Token oper, ${EXPRESSION_BASE_CLASS_NAME} right"
   "Call : ${EXPRESSION_BASE_CLASS_NAME} callee, Token paren, ${EXPRESSION_BASE_CLASS_NAME}[] arguments"
+  "Get : ${EXPRESSION_BASE_CLASS_NAME} obj, Token name"
   "Grouping : ${EXPRESSION_BASE_CLASS_NAME} expression "
   "Literal : object? value "
   "Logical : ${EXPRESSION_BASE_CLASS_NAME} left, Token oper, ${EXPRESSION_BASE_CLASS_NAME} right"
+  "Set : ${EXPRESSION_BASE_CLASS_NAME} obj, Token name, ${EXPRESSION_BASE_CLASS_NAME} value"
   "Unary : Token oper , ${EXPRESSION_BASE_CLASS_NAME} right"
   "Variable : Token name"
 )
