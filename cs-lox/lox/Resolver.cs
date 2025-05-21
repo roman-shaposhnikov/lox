@@ -17,7 +17,14 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
     return new VoidType();
   }
 
-  public VoidType VisitVarStatement(Var statement) {
+  public VoidType VisitClassStatement(Class statement) {
+    Declare(statement.name);
+    Define(statement.name);
+
+    return new();
+  }
+
+  public VoidType VisitVarStatement(Var statement){
     Declare(statement.name);
 
     if (statement.initializer is not null) {
@@ -202,7 +209,8 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
 
   void ResolveLocal(Expression expression, Token name) {
     for (int i = scopes.Count - 1; i >= 0; i--) {
-      var scope = scopes.ElementAt(i);
+      // wtf?! какого хрена в стек новые ел-ты добав. слева
+      var scope = scopes.Reverse().ElementAt(i);
       var variableDeclared = scope.ContainsKey(name.lexeme);
       if (variableDeclared) {
         var skippedScopesCount = scopes.Count - 1 - i;

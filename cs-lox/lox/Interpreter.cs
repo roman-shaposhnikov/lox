@@ -38,6 +38,14 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     return new VoidType();
   }
 
+  public VoidType VisitClassStatement(Class statement) {
+    environment.Define(statement.name.lexeme, null);
+    var loxClass = new LoxClass(statement.name.lexeme);
+    environment.Assign(statement.name, loxClass);
+
+    return new();
+  }
+
   public void ExecuteBlock(Statement[] statements, EnvironmentRecord environment) {
     EnvironmentRecord previous = this.environment;
 

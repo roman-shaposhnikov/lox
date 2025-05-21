@@ -21,6 +21,7 @@ generateAst $TARGET_DIR $EXPRESSION_BASE_CLASS_NAME "${expressionsNodesDescripti
 STATEMENT_BASE_CLASS_NAME="Statement"
 statementsNodesDescription=(
   "Block : ${STATEMENT_BASE_CLASS_NAME}[] statements"
+  "Class : Token name, Function[] methods"
   "ExpressionStatement : ${EXPRESSION_BASE_CLASS_NAME} expression"
   "Function : Token name, Token[] parameters, ${STATEMENT_BASE_CLASS_NAME}[] body"
   "If : Expression condition, ${STATEMENT_BASE_CLASS_NAME} thenBranch, ${STATEMENT_BASE_CLASS_NAME}? elseBranch"

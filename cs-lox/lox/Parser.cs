@@ -15,6 +15,10 @@ class Parser(Token[] tokens) {
 
   Statement? ParseDeclaration() {
     try {
+      if (MoveToNextIfMatchOneOf(TokenType.CLASS)) {
+        return ParseClassDeclaration();
+      }
+
       if (MoveToNextIfMatchOneOf(TokenType.FUN)) {
         return ParseFunction("function");
       }
@@ -28,6 +32,20 @@ class Parser(Token[] tokens) {
       Synchronize();
       return null;
     }
+  }
+
+  Statement ParseClassDeclaration() {
+    Token name = ReportErrorIfNotMatch(TokenType.IDENTIFIER, "Expect class name.");
+    ReportErrorIfNotMatch(TokenType.LEFT_BRACE, "Expect '{' before class body.");
+
+    List<Function> methods = [];
+    while (!CurrentTokenIsTypeOf(TokenType.RIGHT_BRACE) && !IsAtEnd()) {
+      methods.Add(ParseFunction("method"));
+    }
+
+    ReportErrorIfNotMatch(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+
+    return new Class(name, methods.ToArray());
   }
 
   Function ParseFunction(String kind) {
