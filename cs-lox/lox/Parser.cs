@@ -19,7 +19,7 @@ class Parser(Token[] tokens) {
         return ParseFunction("function");
       }
 
-    if (MoveToNextIfMatchOneOf(TokenType.VAR)) {
+      if (MoveToNextIfMatchOneOf(TokenType.VAR)) {
         return ParseVarDeclaration();
       }
 

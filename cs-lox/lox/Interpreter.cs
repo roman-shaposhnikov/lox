@@ -103,12 +103,12 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
   }
 
   public object? VisitVariableExpression(Variable expression) {
-    return lookUpVariable(expression.name, expression);
+    return LookUpVariable(expression.name, expression);
   }
 
-  object? lookUpVariable(Token name, Expression expression) {
-    int? distance = locals[expression];
-    if (distance is not null) {
+  object? LookUpVariable(Token name, Expression expression) {
+    var hasValue = locals.TryGetValue(expression, out int? distance);
+    if (hasValue && distance is not null) {
       return environment.GetAt((int)distance, name.lexeme);
     } else {
       return globals.Get(name);
