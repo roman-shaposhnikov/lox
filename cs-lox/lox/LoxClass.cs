@@ -1,5 +1,8 @@
-class LoxClass(string name) : LoxCallable {
+using FunctionsCollection = System.Collections.Generic.Dictionary<string, LoxFunction>;
+
+class LoxClass(string name, FunctionsCollection methods) : LoxCallable {
   public string name = name;
+  readonly FunctionsCollection methods = methods;
 
   public int Arity() {
     return 0;
@@ -9,6 +12,14 @@ class LoxClass(string name) : LoxCallable {
     LoxInstance instance = new LoxInstance(this);
 
     return instance;
+  }
+
+  public LoxFunction? FindMethod(string name) {
+    if (methods.TryGetValue(name, out LoxFunction? method)) {
+      return method;
+    }
+
+    return null;
   }
 
   public override string ToString() {

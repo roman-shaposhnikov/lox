@@ -13,6 +13,7 @@ interface ExpressionNodeVisitor<ReturnValue> {
   ReturnValue VisitAssignExpression(Assign expression);
   ReturnValue VisitUnaryExpression(Unary expression);
   ReturnValue VisitVariableExpression(Variable expression);
+  ReturnValue VisitThisExpression(This expression);
   ReturnValue VisitLiteralExpression(Literal expression);
   ReturnValue VisitGetExpression(Get expression);
 }
@@ -110,6 +111,15 @@ class Variable(
   public readonly Token name = name;
   public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitVariableExpression(this);
+  }
+}
+
+class This(
+  Token keyword
+) : Expression {
+  public readonly Token keyword = keyword;
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitThisExpression(this);
   }
 }
 

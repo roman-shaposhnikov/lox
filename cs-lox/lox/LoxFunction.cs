@@ -24,6 +24,13 @@ class LoxFunction(Function declaration, EnvironmentRecord closure) : LoxCallable
     return null;
   }
 
+  public LoxFunction Bind(LoxInstance instance) {
+    EnvironmentRecord environment = new(closure);
+    environment.Define("this", instance);
+
+    return new LoxFunction(declaration, environment);
+  }
+
   public override string ToString() {
     return $"<fn {declaration.name.lexeme}>";
   }

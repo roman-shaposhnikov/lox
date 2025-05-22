@@ -2,10 +2,17 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
   readonly Interpreter interpreter = interpreter;
   readonly Stack<Dictionary<string, bool>> scopes = new();
   FunctionType currentFunction = FunctionType.NONE;
+  ClassType currentClass = ClassType.NONE;
 
   enum FunctionType {
     NONE,
-    FUNCTION
+    FUNCTION,
+    METHOD,
+  }
+
+  enum ClassType {
+    NONE,
+    CLASS,
   }
 
   public VoidType VisitBlockStatement(Block statement)
@@ -18,8 +25,22 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
   }
 
   public VoidType VisitClassStatement(Class statement) {
+    ClassType enclosingClass = currentClass;
+    currentClass = ClassType.CLASS;
+
     Declare(statement.name);
     Define(statement.name);
+
+    BeginScope();
+    scopes.Peek().Add("this", true);
+
+    foreach (Function method in statement.methods) {
+      ResolveFunction(method, FunctionType.METHOD);
+    }
+
+    EndScope();
+
+    currentClass = enclosingClass;
 
     return new();
   }
@@ -150,6 +171,18 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
   public VoidType VisitSetExpression(Set expression) {
     Resolve(expression.value);
     Resolve(expression.obj);
+
+    return new();
+  }
+
+  public VoidType VisitThisExpression(This expression) {
+    if (currentClass is ClassType.NONE) {
+      Lox.Error(expression.keyword, "Can't use 'this' outside of a class.");
+
+      return new();
+    }
+
+    ResolveLocal(expression, expression.keyword);
 
     return new();
   }

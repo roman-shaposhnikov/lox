@@ -1,3 +1,5 @@
+using System.Reflection;
+
 class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidType> {
   public readonly EnvironmentRecord globals;
   EnvironmentRecord environment;
@@ -40,7 +42,14 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
 
   public VoidType VisitClassStatement(Class statement) {
     environment.Define(statement.name.lexeme, null);
-    var loxClass = new LoxClass(statement.name.lexeme);
+
+    var methods = new Dictionary<string, LoxFunction>();
+    foreach (Function method in statement.methods) {
+      var function = new LoxFunction(method, environment);
+      methods.Add(method.name.lexeme, function);
+    }
+
+    var loxClass = new LoxClass(statement.name.lexeme, methods);
     environment.Assign(statement.name, loxClass);
 
     return new();
@@ -297,6 +306,10 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     instance.Set(expression.name, value);
 
     return value;
+  }
+
+  public object? VisitThisExpression(This expression) {
+    return LookUpVariable(expression.keyword, expression);
   }
 
   bool IsTruthy(object? value) {

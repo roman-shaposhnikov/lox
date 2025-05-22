@@ -398,6 +398,10 @@ class Parser(Token[] tokens) {
       return new Literal(PeekPreviousToken().literal);
     }
 
+    if (MoveToNextIfMatchOneOf(TokenType.THIS)) {
+      return new This(PeekPreviousToken());
+    }
+
     if (MoveToNextIfMatchOneOf(TokenType.IDENTIFIER)) {
       return new Variable(PeekPreviousToken());
     }
