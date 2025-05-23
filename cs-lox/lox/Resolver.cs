@@ -7,6 +7,7 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
   enum FunctionType {
     NONE,
     FUNCTION,
+    INITIALIZER,
     METHOD,
   }
 
@@ -35,7 +36,9 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
     scopes.Peek().Add("this", true);
 
     foreach (Function method in statement.methods) {
-      ResolveFunction(method, FunctionType.METHOD);
+      var isInitMethod = method.name.lexeme.Equals("init");
+      var functionType = isInitMethod ? FunctionType.INITIALIZER : FunctionType.METHOD;
+      ResolveFunction(method, functionType);
     }
 
     EndScope();
@@ -115,6 +118,10 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
     }
 
     if (statement.value != null) {
+      if (currentFunction is FunctionType.INITIALIZER) {
+        Lox.Error(statement.keyword, "Can't return a value from an initializer.");
+      }
+
       Resolve(statement.value);
     }
 

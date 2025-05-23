@@ -1,6 +1,7 @@
-class LoxFunction(Function declaration, EnvironmentRecord closure) : LoxCallable {
+class LoxFunction(Function declaration, EnvironmentRecord closure, bool isInitializer) : LoxCallable {
   readonly Function declaration = declaration;
   readonly EnvironmentRecord closure = closure;
+  readonly bool isInitializer = isInitializer;
 
   public int Arity() {
     return declaration.parameters.Length;
@@ -18,7 +19,15 @@ class LoxFunction(Function declaration, EnvironmentRecord closure) : LoxCallable
     try {
       interpreter.ExecuteBlock(declaration.body, environment);
     } catch (ReturnException expression) {
+      if (isInitializer) {
+        return closure.GetAt(0, "this");
+      }
+
       return expression.value;
+    }
+
+    if (isInitializer) {
+      return closure.GetAt(0, "this");
     }
 
     return null;
@@ -28,7 +37,7 @@ class LoxFunction(Function declaration, EnvironmentRecord closure) : LoxCallable
     EnvironmentRecord environment = new(closure);
     environment.Define("this", instance);
 
-    return new LoxFunction(declaration, environment);
+    return new LoxFunction(declaration, environment, isInitializer);
   }
 
   public override string ToString() {

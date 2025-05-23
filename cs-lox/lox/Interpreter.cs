@@ -45,7 +45,7 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
 
     var methods = new Dictionary<string, LoxFunction>();
     foreach (Function method in statement.methods) {
-      var function = new LoxFunction(method, environment);
+      var function = new LoxFunction(method, environment, method.name.lexeme.Equals("init"));
       methods.Add(method.name.lexeme, function);
     }
 
@@ -139,7 +139,7 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
   }
 
   public VoidType VisitFunctionStatement(Function statement) {
-    var function = new LoxFunction(statement, environment);
+    var function = new LoxFunction(statement, environment, false);
     environment.Define(statement.name.lexeme, function);
 
     return new VoidType();

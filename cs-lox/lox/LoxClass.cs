@@ -5,11 +5,16 @@ class LoxClass(string name, FunctionsCollection methods) : LoxCallable {
   readonly FunctionsCollection methods = methods;
 
   public int Arity() {
-    return 0;
+    LoxFunction? initializer = FindMethod("init");
+    int classArity = initializer?.Arity() ?? 0;
+
+    return classArity;
   }
 
   public object? Call(Interpreter interpreter, object?[] arguments) {
-    LoxInstance instance = new LoxInstance(this);
+    LoxInstance instance = new(this);
+    LoxFunction? initializer = FindMethod("init");
+    initializer?.Bind(instance).Call(interpreter, arguments);
 
     return instance;
   }
