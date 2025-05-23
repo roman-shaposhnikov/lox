@@ -36,6 +36,13 @@ class Parser(Token[] tokens) {
 
   Statement ParseClassDeclaration() {
     Token name = ReportErrorIfNotMatch(TokenType.IDENTIFIER, "Expect class name.");
+
+    Variable? superclass = null;
+    if (MoveToNextIfMatchOneOf(TokenType.LESS)) {
+      ReportErrorIfNotMatch(TokenType.IDENTIFIER, "Expect superclass name.");
+      superclass = new Variable(PeekPreviousToken());
+    }
+
     ReportErrorIfNotMatch(TokenType.LEFT_BRACE, "Expect '{' before class body.");
 
     List<Function> methods = [];
@@ -45,7 +52,7 @@ class Parser(Token[] tokens) {
 
     ReportErrorIfNotMatch(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
 
-    return new Class(name, methods.ToArray());
+    return new Class(name, superclass, methods.ToArray());
   }
 
   Function ParseFunction(String kind) {
@@ -396,6 +403,14 @@ class Parser(Token[] tokens) {
 
     if (MoveToNextIfMatchOneOf(TokenType.NUMBER, TokenType.STRING)) {
       return new Literal(PeekPreviousToken().literal);
+    }
+
+    if (MoveToNextIfMatchOneOf(TokenType.SUPER)) {
+      Token keyword = PeekPreviousToken();
+      ReportErrorIfNotMatch(TokenType.DOT, "Expect '.' after 'super'.");
+      Token method = ReportErrorIfNotMatch(TokenType.IDENTIFIER, "Expect superclass method name.");
+
+      return new Super(keyword, method);
     }
 
     if (MoveToNextIfMatchOneOf(TokenType.THIS)) {

@@ -7,6 +7,7 @@
 interface ExpressionNodeVisitor<ReturnValue> {
   ReturnValue VisitCallExpression(Call expression);
   ReturnValue VisitSetExpression(Set expression);
+  ReturnValue VisitSuperExpression(Super expression);
   ReturnValue VisitGroupingExpression(Grouping expression);
   ReturnValue VisitBinaryExpression(Binary expression);
   ReturnValue VisitLogicalExpression(Logical expression);
@@ -45,6 +46,17 @@ class Set(
   public readonly Expression value = value;
   public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
     return visitor.VisitSetExpression(this);
+  }
+}
+
+class Super(
+  Token keyword,
+  Token method
+) : Expression {
+  public readonly Token keyword = keyword;
+  public readonly Token method = method;
+  public override ReturnType Accept<ReturnType>(ExpressionNodeVisitor<ReturnType> visitor) {
+    return visitor.VisitSuperExpression(this);
   }
 }
 

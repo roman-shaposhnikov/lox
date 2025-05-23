@@ -84,9 +84,11 @@ class While(
 
 class Class(
   Token name,
+  Variable? superclass,
   Function[] methods
 ) : Statement {
   public readonly Token name = name;
+  public readonly Variable? superclass = superclass;
   public readonly Function[] methods = methods;
   public override ReturnType Accept<ReturnType>(StatementNodeVisitor<ReturnType> visitor) {
     return visitor.VisitClassStatement(this);

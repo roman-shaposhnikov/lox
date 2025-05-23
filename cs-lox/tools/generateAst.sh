@@ -14,6 +14,7 @@ expressionsNodesDescription=(
   "Literal : object? value "
   "Logical : ${EXPRESSION_BASE_CLASS_NAME} left, Token oper, ${EXPRESSION_BASE_CLASS_NAME} right"
   "Set : ${EXPRESSION_BASE_CLASS_NAME} obj, Token name, ${EXPRESSION_BASE_CLASS_NAME} value"
+  "Super : Token keyword, Token method"
   "This : Token keyword"
   "Unary : Token oper , ${EXPRESSION_BASE_CLASS_NAME} right"
   "Variable : Token name"
@@ -24,7 +25,7 @@ generateAst $TARGET_DIR $EXPRESSION_BASE_CLASS_NAME "${expressionsNodesDescripti
 STATEMENT_BASE_CLASS_NAME="Statement"
 statementsNodesDescription=(
   "Block : ${STATEMENT_BASE_CLASS_NAME}[] statements"
-  "Class : Token name, Function[] methods"
+  "Class : Token name, Variable? superclass, Function[] methods"
   "ExpressionStatement : ${EXPRESSION_BASE_CLASS_NAME} expression"
   "Function : Token name, Token[] parameters, ${STATEMENT_BASE_CLASS_NAME}[] body"
   "If : Expression condition, ${STATEMENT_BASE_CLASS_NAME} thenBranch, ${STATEMENT_BASE_CLASS_NAME}? elseBranch"

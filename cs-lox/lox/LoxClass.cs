@@ -1,7 +1,8 @@
 using FunctionsCollection = System.Collections.Generic.Dictionary<string, LoxFunction>;
 
-class LoxClass(string name, FunctionsCollection methods) : LoxCallable {
+class LoxClass(string name, LoxClass? superclass, FunctionsCollection methods) : LoxCallable {
   public string name = name;
+  public LoxClass? superclass = superclass;
   readonly FunctionsCollection methods = methods;
 
   public int Arity() {
@@ -22,6 +23,10 @@ class LoxClass(string name, FunctionsCollection methods) : LoxCallable {
   public LoxFunction? FindMethod(string name) {
     if (methods.TryGetValue(name, out LoxFunction? method)) {
       return method;
+    }
+
+    if (superclass is not null) {
+      return superclass.FindMethod(name);
     }
 
     return null;

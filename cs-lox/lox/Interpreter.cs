@@ -41,7 +41,22 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
   }
 
   public VoidType VisitClassStatement(Class statement) {
+    LoxClass? superclass = null;
+    if (statement.superclass is not null) {
+      var evaluatedSuperclass = Evaluate(statement.superclass);
+      if (evaluatedSuperclass is not LoxClass) {
+        throw new RuntimeError(statement.superclass.name, "Superclass must be a class.");
+      }
+
+      superclass = (LoxClass)evaluatedSuperclass;
+    }
+
     environment.Define(statement.name.lexeme, null);
+
+    if (statement.superclass is not null) {
+      environment = new EnvironmentRecord(environment);
+      environment.Define("super", superclass);
+    }
 
     var methods = new Dictionary<string, LoxFunction>();
     foreach (Function method in statement.methods) {
@@ -49,7 +64,12 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
       methods.Add(method.name.lexeme, function);
     }
 
-    var loxClass = new LoxClass(statement.name.lexeme, methods);
+    var loxClass = new LoxClass(statement.name.lexeme, superclass, methods);
+
+    if (superclass is not null) {
+      environment = environment.enclosing;
+    }
+
     environment.Assign(statement.name, loxClass);
 
     return new();
@@ -306,6 +326,19 @@ class Interpreter : ExpressionNodeVisitor<object?>, StatementNodeVisitor<VoidTyp
     instance.Set(expression.name, value);
 
     return value;
+  }
+
+  public object? VisitSuperExpression(Super expression) {
+    int? distance = locals[expression];
+    var superclass = (LoxClass)environment.GetAt((int)distance, "super");
+    var obj = (LoxInstance)environment.GetAt((int)distance - 1, "this");
+
+    var method = superclass.FindMethod(expression.method.lexeme);
+    if (method is null) {
+      throw new RuntimeError(expression.method, $"Undefined property '{expression.method.lexeme}'.");
+    }
+
+    return method.Bind(obj);
   }
 
   public object? VisitThisExpression(This expression) {

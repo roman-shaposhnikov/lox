@@ -14,6 +14,7 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
   enum ClassType {
     NONE,
     CLASS,
+    SUBCLASS,
   }
 
   public VoidType VisitBlockStatement(Block statement)
@@ -32,6 +33,18 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
     Declare(statement.name);
     Define(statement.name);
 
+    if (statement.superclass is not null) {
+      if (statement.name.lexeme.Equals(statement.superclass.name.lexeme)) {
+        throw new RuntimeError(statement.superclass.name, "A class cannot inherit from itself.");
+      }
+
+      currentClass = ClassType.SUBCLASS;
+      Resolve(statement.superclass);
+
+      BeginScope();
+      scopes.Peek().Add("super", true);
+    }
+
     BeginScope();
     scopes.Peek().Add("this", true);
 
@@ -42,6 +55,10 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
     }
 
     EndScope();
+
+    if (statement.superclass is not null) {
+      EndScope();
+    }
 
     currentClass = enclosingClass;
 
@@ -178,6 +195,18 @@ class Resolver(Interpreter interpreter) : ExpressionNodeVisitor<VoidType>, State
   public VoidType VisitSetExpression(Set expression) {
     Resolve(expression.value);
     Resolve(expression.obj);
+
+    return new();
+  }
+
+  public VoidType VisitSuperExpression(Super expression) {
+    if (currentClass is ClassType.NONE) {
+      Lox.Error(expression.keyword, "Can't use 'super' outside of a class.");
+    } else if (currentClass is not ClassType.SUBCLASS) {
+      Lox.Error(expression.keyword, "Can't use 'super' in a class with no superclass.");
+    }
+
+    ResolveLocal(expression, expression.keyword);
 
     return new();
   }
