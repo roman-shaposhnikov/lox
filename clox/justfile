@@ -1,7 +1,0 @@
-_: build run
-
-build:
-  make all clean
-
-run:
-  ./bin/run
