@@ -4,15 +4,26 @@
 #include "debug.h"
 #include "vm.h"
 
+static void resetStack();
 static InterpretResult run();
 
 VM vm;
 
 void initVM() {
+  resetStack();
 }
 
 void freeVM() {}
 
+void push(Value value) {
+  *vm.stackTop = value;
+  vm.stackTop++;
+}
+
+Value pop() {
+  vm.stackTop--;
+  return *vm.stackTop;
+}
 
 InterpretResult interpret(Chunk* chunk) {
   vm.chunk = chunk;
@@ -20,6 +31,9 @@ InterpretResult interpret(Chunk* chunk) {
   return run();
 }
 
+static void resetStack() {
+  vm.stackTop = vm.stack;
+}
 
 static InterpretResult run() {
 #define READ_BYTE() (*vm.ip++)
