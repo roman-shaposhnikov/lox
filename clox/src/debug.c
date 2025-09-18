@@ -44,6 +44,18 @@ int disassembleInstruction(Chunk* chunk, int offset) {
       simpleInstruction("OP_FALSE", offset);
       break;
     }
+    case OP_EQUAL: {
+      simpleInstruction("OP_EQUAL", offset);
+      break;
+    }
+    case OP_GREATER: {
+      simpleInstruction("OP_GREATER", offset);
+      break;
+    }
+    case OP_LESS: {
+      simpleInstruction("OP_LESS", offset);
+      break;
+    }
     case OP_ADD: {
       simpleInstruction("OP_ADD", offset);
       break;
@@ -58,6 +70,10 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     }
     case OP_DIVIDE: {
       simpleInstruction("OP_DIVIDE", offset);
+      break;
+    }
+    case OP_NOT: {
+      simpleInstruction("OP_NOT", offset);
       break;
     }
     case OP_NEGATE: {

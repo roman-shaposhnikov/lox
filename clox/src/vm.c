@@ -10,6 +10,7 @@ static void resetStack();
 static InterpretResult run();
 static Value peek(int distance);
 static void runtimeError(const char* format, ...);
+static bool isFalsey(Value value);
 
 VM vm;
 
@@ -31,6 +32,10 @@ Value pop() {
 
 static Value peek(int distance) {
   return vm.stackTop[-1 - distance];
+}
+
+static bool isFalsey(Value value) {
+  return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
 
 InterpretResult interpret(const char* source) {
@@ -112,6 +117,20 @@ static InterpretResult run() {
         push(BOOL_VAL(false));
         break;
       }
+      case OP_EQUAL: {
+        Value b = pop();
+        Value a = pop();
+        push(BOOL_VAL(valuesEqual(a, b)));
+        break;
+      }
+      case OP_GREATER: {
+        BINARY_OP(BOOL_VAL, >);
+        break;
+      }
+      case OP_LESS: {
+        BINARY_OP(BOOL_VAL, <);
+        break;
+      }
       case OP_ADD: {
         BINARY_OP(NUMBER_VAL, +);
         break;
@@ -126,6 +145,10 @@ static InterpretResult run() {
       }
       case OP_DIVIDE: {
         BINARY_OP(NUMBER_VAL, /);
+        break;
+      }
+      case OP_NOT: {
+        push(BOOL_VAL(isFalsey(pop())));
         break;
       }
       case OP_NEGATE: {
