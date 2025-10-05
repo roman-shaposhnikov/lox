@@ -7,6 +7,7 @@ static void disassembleInstructions(Chunk* chunk);
 static int simpleInstruction(const char* name, int offset);
 static int byteInstruction(const char* name, Chunk* chunk, int offset);
 static int constantInstruction(const char* name, Chunk* chunk, int offset);
+static int jumpInstruction(const char* name, int sign, Chunk* chunk, int offset);
 
 void disassembleChunk(Chunk* chunk, const char* name) {
   printf("== %s ==\n", name);
@@ -87,6 +88,12 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     case OP_PRINT: {
       return simpleInstruction("OP_PRINT", offset);
     }
+    case OP_JUMP: {
+      return jumpInstruction("OP_JUMP", 1, chunk, offset);
+    }
+    case OP_JUMP_IF_FALSE: {
+      return jumpInstruction("OP_JUMP_IF_FALSE", 1, chunk, offset);
+    }
     case OP_RETURN: {
       return simpleInstruction("OP_RETURN", offset);
     }
@@ -114,4 +121,11 @@ static int constantInstruction(const char* name, Chunk* chunk, int offset) {
   printValue(chunk->constants.values[constant]);
   printf("'\n");
   return offset + 2;
+}
+
+static int jumpInstruction(const char* name, int sign, Chunk* chunk, int offset) {
+  uint16_t jump = chunk->code[offset + 1] << 8;
+  jump |= chunk->code[offset + 2];
+  printf("%-16s %4d -> %d\n", name, offset, offset + 3 + sign * jump);
+  return offset + 3;
 }
