@@ -2,8 +2,9 @@ CC := gcc
 # CFLAGS := -g -Wall -Wextra -Werror -O3 -std=gnu11
 CFLAGS := -g -Wall -Werror -O3 -std=gnu11
 
-SOURCE := $(wildcard src/*.c)
-OBJECTS := $(SOURCE:.c=.o)
+EXTENSION := c
+SOURCE := $(wildcard src/*.${EXTENSION})
+OBJECTS := $(SOURCE:.${EXTENSION}=.o)
 TARGET := bin/run
 
 build: $(TARGET) finish
