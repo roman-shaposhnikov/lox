@@ -60,6 +60,7 @@ static void block();
 static void beginScope();
 static void endScope();
 static void printStatement();
+static void returnStatement();
 static void whileStatement();
 static void emitLoop(int loopStart);
 static void ifStatement();
@@ -412,7 +413,6 @@ static void printStatement() {
   consume(TOKEN_SEMICOLON, "Expect ';' after value.");
   emitByte(OP_PRINT);
 }
-
 
 static void returnStatement() {
   if (current->type == TYPE_SCRIPT) {
