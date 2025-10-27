@@ -11,6 +11,19 @@ static uint32_t hashString(const char* key, int length);
 static Obj* allocateObject(size_t size, ObjType type);
 static ObjString* allocateString(char* chars, int length, uint32_t hash);
 
+
+#define ALLOCATE_OBJ(type, objType) \
+  (type*)allocateObject(sizeof(type), objType)
+
+static Obj* allocateObject(size_t size, ObjType type) {
+  Obj* object = (Obj*)reallocate(NULL, 0, size);
+  object->type = type;
+
+  object->next = vm.objects;
+  vm.objects = object;
+  return object;
+}
+
 /*
   If we had an ObjString for a string literal, and tried to free its character
   array that pointed into the original source code string, bad things would happen.
@@ -39,6 +52,12 @@ static void printFunction(ObjFunction* function) {
   printf("<fn %s>", function->name->chars);
 }
 
+ObjUpvalue* newUpvalue(Value* slot) {
+  ObjUpvalue* upvalue = ALLOCATE_OBJ(ObjUpvalue, OBJ_UPVALUE);
+  upvalue->location = slot;
+  return upvalue;
+}
+
 void printObject(Value value) {
   switch (OBJ_TYPE(value)) {
     case OBJ_CLOSURE: {
@@ -57,30 +76,32 @@ void printObject(Value value) {
       printf("%s", AS_STRING(value)->chars);
       break;
     }
+    case OBJ_UPVALUE: {
+      /* will never execute */
+      printf("upvalue");
+      break;
+    }
   }
 }
 
-#define ALLOCATE_OBJ(type, objType) \
-  (type*)allocateObject(sizeof(type), objType)
-
-static Obj* allocateObject(size_t size, ObjType type) {
-  Obj* object = (Obj*)reallocate(NULL, 0, size);
-  object->type = type;
-
-  object->next = vm.objects;
-  vm.objects = object;
-  return object;
-}
-
 ObjClosure* newClosure(ObjFunction* function) {
+  ObjUpvalue** upvalues = ALLOCATE(ObjUpvalue*, function->upvalueCount);
+
+  for (int i = 0; i < function->upvalueCount; i++) {
+    upvalues[i] = NULL;
+  }
+
   ObjClosure* closure = ALLOCATE_OBJ(ObjClosure, OBJ_CLOSURE);
   closure->function = function;
+  closure->upvalues = upvalues;
+  closure->upvalueCount = function->upvalueCount;
   return closure;
 }
 
 ObjFunction* newFunction() {
   ObjFunction* function = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
   function->arity = 0;
+  function->upvalueCount = 0;
   function->name = NULL;
   initChunk(&function->chunk);
   return function;
