@@ -18,9 +18,15 @@ static ObjString* allocateString(char* chars, int length, uint32_t hash);
 static Obj* allocateObject(size_t size, ObjType type) {
   Obj* object = (Obj*)reallocate(NULL, 0, size);
   object->type = type;
+  object->isMarked = false;
 
   object->next = vm.objects;
   vm.objects = object;
+
+#ifdef DEBUG_LOG_GC
+  printf("%p allocate %zu for %d\n", (void*)object, size, type);
+#endif
+
   return object;
 }
 
@@ -120,7 +126,15 @@ static ObjString* allocateString(char* chars, int length, uint32_t hash) {
   string->length = length;
   string->chars = chars;
   string->hash = hash;
+
+  /*
+   * This ensures the string is safe while the table is being resized.
+   * Once it survives that, allocateString() will return it to some caller
+   * which can then take responsibility for ensuring the string is still reachable before the next heap allocation occurs.
+   */
+  push(OBJ_VAL(string));
   tableSet(&vm.strings, string, NIL_VAL);
+  pop();
   return string;
 }
 

@@ -27,6 +27,17 @@ static Value clockNative() {
 void initVM() {
   resetStack();
   vm.objects = NULL;
+  vm.bytesAllocated = 0;
+  /*
+   * The starting threshold here is arbitrary.
+   * The goal is to not trigger the first few GCs too quickly but also to not wait too long.
+   * If we had some real-world Lox programs, we could profile those to tune this.
+   */
+  vm.nextGC = 1024 * 1024;
+
+  vm.grayCount = 0;
+  vm.grayCapacity = 0;
+  vm.grayStack = NULL;
 
   initTable(&vm.globals);
   initTable(&vm.strings);
@@ -129,8 +140,12 @@ static bool isFalsey(Value value) {
 }
 
 static void concatenate() {
-  ObjString* b = AS_STRING(pop());
-  ObjString* a = AS_STRING(pop());
+  /*
+   * Concatenating two strings requires allocating a new character array on the heap, which can in turn trigger a GC.
+   * Since we’ve already popped the operand strings by that point, they can potentially be missed by the mark phase and get swept away
+   */
+  ObjString* b = AS_STRING(peek(0));
+  ObjString* a = AS_STRING(peek(1));
 
   int length = a->length + b->length;
   char* chars = ALLOCATE(char, length + 1);
@@ -139,6 +154,8 @@ static void concatenate() {
   chars[length] = '\0';
 
   ObjString* result = takeString(chars, length);
+  pop();
+  pop();
   push(OBJ_VAL(result));
 }
 
