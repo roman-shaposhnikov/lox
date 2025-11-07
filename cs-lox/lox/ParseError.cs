@@ -1,1 +1,0 @@
-class ParseError : Exception {}
