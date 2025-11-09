@@ -5,7 +5,7 @@ use super::*;
 #[test]
 fn empty_string_contains_eof_at_first_place() {
     let mut scanner = Scanner::new("");
-    let token = scanner.scan_token().unwrap();
+    let token = scanner.next().unwrap();
     assert_eq!(token.kind, TokenKind::Eof);
 }
 
@@ -21,10 +21,24 @@ fn empty_string_contains_eof_at_first_place() {
 #[case(";", TokenKind::Semicolon)]
 #[case("/", TokenKind::Slash)]
 #[case("*", TokenKind::Star)]
-fn match_single_character(#[case] input: &str, #[case] expected: TokenKind) {
+fn match_single_character(#[case] input: &'static str, #[case] expected: TokenKind) {
     let mut scanner = Scanner::new(input);
-    let token = scanner
-        .scan_token()
-        .expect(&format!("unmatched character in test data -- {input}"));
+    let token = scanner.next().unwrap();
     assert_eq!(token.kind, expected, "input {input} to be a {expected:?} token");
+}
+
+#[rstest]
+#[case("         ,", TokenKind::Comma)]
+#[case(")         ", TokenKind::RightParen)]
+#[case("    /     ", TokenKind::Slash)]
+#[case("    
+    +", TokenKind::Plus)] // newline
+#[case("\n+", TokenKind::Plus)] // newline
+#[case("	{", TokenKind::LeftBrace)] // tabulation
+#[case("\t{", TokenKind::LeftBrace)] // tabulation
+#[case("\r", TokenKind::Eof)] // caret return
+fn skip_whitespace(#[case] input: &'static str, #[case] expected: TokenKind) {
+    let mut scanner = Scanner::new(input);
+    let token = scanner.next().unwrap();
+    assert_eq!(token.kind, expected);
 }

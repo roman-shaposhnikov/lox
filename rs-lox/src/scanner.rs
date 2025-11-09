@@ -1,10 +1,9 @@
-use std::{ str::Chars };
-
 mod tests;
 
 #[derive(PartialEq, Debug)]
 enum TokenKind {
     Eof,
+    Error,
     // Single-character tokens.
     LeftParen,
     RightParen,
@@ -23,28 +22,40 @@ struct Token {
     kind: TokenKind,
 }
 
-struct Scanner<'a> {
-    source: Chars<'a>,
+struct Scanner {
+    source: Box<dyn Iterator<Item = char>>,
 }
 
-impl<'a> Scanner<'a> {
-    fn new(source: &'a str) -> Self {
+impl Scanner {
+    // TODO: try to avoid 'static lifetime
+    fn new(input: &'static str) -> Self {
         Self {
-            source: source.chars(),
+            source: Box::new(
+                input
+                    .chars()
+                    .filter(|c| *c != ' ')
+                    .filter(|c| *c != '\n') // newline
+                    .filter(|c| *c != '\t') // tabulation
+                    .filter(|c| *c != '\r') // caret return
+            ),
         }
     }
 
-    fn scan_token(&mut self) -> Result<Token, ()> {
-        if let Some(kind) = self.scan_token_kind() { Ok(Token { kind }) } else { Err(()) }
-    }
-
-    fn scan_token_kind(&mut self) -> Option<TokenKind> {
+    fn scan_token_kind(&mut self) -> TokenKind {
         if let Some(value) = self.source.next() {
-            let c = Character::new(value);
-            c.token_kind()
+            Character::new(value).token_kind()
         } else {
-            Some(TokenKind::Eof)
+            TokenKind::Eof
         }
+    }
+}
+
+impl Iterator for Scanner {
+    type Item = Token;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let kind = self.scan_token_kind();
+        Some(Token { kind })
     }
 }
 
@@ -57,20 +68,20 @@ impl Character {
         Self { value }
     }
 
-    fn token_kind(&self) -> Option<TokenKind> {
+    fn token_kind(&self) -> TokenKind {
         match self.value {
-            '(' => Some(TokenKind::LeftParen),
-            ')' => Some(TokenKind::RightParen),
-            '{' => Some(TokenKind::LeftBrace),
-            '}' => Some(TokenKind::RightBrace),
-            ';' => Some(TokenKind::Semicolon),
-            ',' => Some(TokenKind::Comma),
-            '.' => Some(TokenKind::Dot),
-            '-' => Some(TokenKind::Minus),
-            '+' => Some(TokenKind::Plus),
-            '/' => Some(TokenKind::Slash),
-            '*' => Some(TokenKind::Star),
-            _ => None,
+            '(' => TokenKind::LeftParen,
+            ')' => TokenKind::RightParen,
+            '{' => TokenKind::LeftBrace,
+            '}' => TokenKind::RightBrace,
+            ';' => TokenKind::Semicolon,
+            ',' => TokenKind::Comma,
+            '.' => TokenKind::Dot,
+            '-' => TokenKind::Minus,
+            '+' => TokenKind::Plus,
+            '/' => TokenKind::Slash,
+            '*' => TokenKind::Star,
+            _ => TokenKind::Error,
         }
     }
 }
