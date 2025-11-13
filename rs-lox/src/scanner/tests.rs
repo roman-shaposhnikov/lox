@@ -1,6 +1,7 @@
 use rstest::rstest;
 
-use super::*;
+use super::Scanner;
+use super::token::TokenKind;
 
 #[test]
 fn empty_string_contains_eof_at_first_place() {
@@ -38,6 +39,20 @@ fn match_single_character(#[case] input: &'static str, #[case] expected: TokenKi
 #[case("\t{", TokenKind::LeftBrace)] // tabulation
 #[case("\r", TokenKind::Eof)] // caret return
 fn skip_whitespace(#[case] input: &'static str, #[case] expected: TokenKind) {
+    let mut scanner = Scanner::new(input);
+    let token = scanner.next().unwrap();
+    assert_eq!(token.kind, expected);
+}
+
+#[rstest]
+#[case("// test", TokenKind::Eof)]
+#[case("\
+// whole line
+*", TokenKind::Star)]
+#[case("\
+// comment // inside comment
+-", TokenKind::Minus)]
+fn skip_comments(#[case] input: &'static str, #[case] expected: TokenKind) {
     let mut scanner = Scanner::new(input);
     let token = scanner.next().unwrap();
     assert_eq!(token.kind, expected);
