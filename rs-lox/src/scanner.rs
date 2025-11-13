@@ -1,29 +1,13 @@
 mod tests;
+pub mod token;
+pub mod character;
 
-#[derive(PartialEq, Debug)]
-enum TokenKind {
-    Eof,
-    Error,
-    // Single-character tokens.
-    LeftParen,
-    RightParen,
-    LeftBrace,
-    RightBrace,
-    Comma,
-    Dot,
-    Minus,
-    Plus,
-    Semicolon,
-    Slash,
-    Star,
-}
-
-struct Token {
-    kind: TokenKind,
-}
+use token::*;
+use character::*;
+use crate::shared::types::AnyIter;
 
 struct Scanner {
-    source: Box<dyn Iterator<Item = char>>,
+    source: AnyIter<char>,
 }
 
 impl Scanner {
@@ -31,17 +15,21 @@ impl Scanner {
     fn new(input: &'static str) -> Self {
         Self {
             source: Box::new(
-                input
-                    .chars()
-                    .filter(|c| *c != ' ')
-                    .filter(|c| *c != '\n') // newline
-                    .filter(|c| *c != '\t') // tabulation
-                    .filter(|c| *c != '\r') // caret return
+                WithoutComments::new(
+                    Box::new(
+                        input
+                            .chars()
+                            .filter(|c| *c != ' ')
+                            .filter(|c| *c != '\t') // tabulation
+                            .filter(|c| *c != '\r') // caret return
+                    )
+                ).filter(|c| *c != '\n') // newline
             ),
         }
     }
 
     fn scan_token_kind(&mut self) -> TokenKind {
+        println!("scan_token_kind");
         if let Some(value) = self.source.next() {
             Character::new(value).token_kind()
         } else {
@@ -59,29 +47,42 @@ impl Iterator for Scanner {
     }
 }
 
-struct Character {
-    value: char,
+struct WithoutComments {
+    iter: AnyIter<char>,
+    // TODO: try to remove this field and use Peekable instead
+    prev: Option<char>,
 }
 
-impl Character {
-    fn new(value: char) -> Self {
-        Self { value }
+impl WithoutComments {
+    fn new(iter: AnyIter<char>) -> Self {
+        Self {
+            iter,
+            prev: None,
+        }
     }
+}
 
-    fn token_kind(&self) -> TokenKind {
-        match self.value {
-            '(' => TokenKind::LeftParen,
-            ')' => TokenKind::RightParen,
-            '{' => TokenKind::LeftBrace,
-            '}' => TokenKind::RightBrace,
-            ';' => TokenKind::Semicolon,
-            ',' => TokenKind::Comma,
-            '.' => TokenKind::Dot,
-            '-' => TokenKind::Minus,
-            '+' => TokenKind::Plus,
-            '/' => TokenKind::Slash,
-            '*' => TokenKind::Star,
-            _ => TokenKind::Error,
+impl Iterator for WithoutComments {
+    type Item = char;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.prev.is_some() {
+            return self.prev.take();
+        }
+
+        let first = self.iter.next()?;
+        if first == '/' {
+            let second = self.iter.next();
+            if let Some('/') = second {
+                // TODO: try to use skip_while instead
+                while self.iter.next().is_some_and(|n| n != '\n') {}
+                self.iter.next()
+            } else {
+                self.prev = second;
+                Some(first)
+            }
+        } else {
+            Some(first)
         }
     }
 }
