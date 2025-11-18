@@ -1,6 +1,6 @@
 use std::iter::Peekable;
 
-use crate::shared::types::AnyIter;
+use crate::shared::{ types::AnyIter, exts::IteratorExt };
 
 pub struct WithoutComments(Peekable<AnyIter<char>>);
 
@@ -18,9 +18,7 @@ impl Iterator for WithoutComments {
         if first == '/' {
             let second = self.0.peek();
             if let Some('/') = second {
-                // TODO: try to use skip_while instead
-                while self.0.next().is_some_and(|n| n != '\n') {}
-                self.0.next()
+                self.0.skip_while_borrow(&mut (|n| n != '\n')).next()
             } else {
                 Some(first)
             }
