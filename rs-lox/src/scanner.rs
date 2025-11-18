@@ -1,11 +1,13 @@
 mod tests;
 pub mod token;
 pub mod character;
+pub mod without_comments;
 
 use std::iter::Peekable;
 
 use token::*;
 use character::*;
+use without_comments::WithoutComments;
 use crate::shared::types::AnyIter;
 
 struct Scanner {
@@ -48,45 +50,5 @@ impl Iterator for Scanner {
     fn next(&mut self) -> Option<Self::Item> {
         let kind = self.scan_token_kind();
         Some(Token { kind })
-    }
-}
-
-struct WithoutComments {
-    iter: AnyIter<char>,
-    // TODO: try to remove this field and use Peekable instead
-    prev: Option<char>,
-}
-
-impl WithoutComments {
-    fn new(iter: AnyIter<char>) -> Self {
-        Self {
-            iter,
-            prev: None,
-        }
-    }
-}
-
-impl Iterator for WithoutComments {
-    type Item = char;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.prev.is_some() {
-            return self.prev.take();
-        }
-
-        let first = self.iter.next()?;
-        if first == '/' {
-            let second = self.iter.next();
-            if let Some('/') = second {
-                // TODO: try to use skip_while instead
-                while self.iter.next().is_some_and(|n| n != '\n') {}
-                self.iter.next()
-            } else {
-                self.prev = second;
-                Some(first)
-            }
-        } else {
-            Some(first)
-        }
     }
 }
