@@ -14,6 +14,15 @@ pub enum TokenKind {
     Semicolon,
     Slash,
     Star,
+    // One or two character tokens.
+    Bang,
+    BangEqual,
+    Equal,
+    EqualEqual,
+    Greater,
+    GreaterEqual,
+    Less,
+    LessEqual,
 }
 
 pub struct Token {
