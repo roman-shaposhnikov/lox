@@ -1,17 +1,12 @@
+use std::iter::Peekable;
+
 use crate::shared::types::AnyIter;
 
-pub struct WithoutComments {
-    iter: AnyIter<char>,
-    // TODO: try to remove this field and use Peekable instead
-    prev: Option<char>,
-}
+pub struct WithoutComments(Peekable<AnyIter<char>>);
 
 impl WithoutComments {
-    pub fn new(iter: AnyIter<char>) -> Self {
-        Self {
-            iter,
-            prev: None,
-        }
+    pub fn new(iter: Peekable<AnyIter<char>>) -> Self {
+        Self(iter)
     }
 }
 
@@ -19,19 +14,14 @@ impl Iterator for WithoutComments {
     type Item = char;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.prev.is_some() {
-            return self.prev.take();
-        }
-
-        let first = self.iter.next()?;
+        let first = self.0.next()?;
         if first == '/' {
-            let second = self.iter.next();
+            let second = self.0.peek();
             if let Some('/') = second {
                 // TODO: try to use skip_while instead
-                while self.iter.next().is_some_and(|n| n != '\n') {}
-                self.iter.next()
+                while self.0.next().is_some_and(|n| n != '\n') {}
+                self.0.next()
             } else {
-                self.prev = second;
                 Some(first)
             }
         } else {

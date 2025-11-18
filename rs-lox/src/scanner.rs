@@ -18,15 +18,14 @@ impl Scanner {
     // TODO: try to avoid 'static lifetime
     fn new(input: &'static str) -> Self {
         let iter: AnyIter<char> = Box::new(
-            WithoutComments::new(
-                Box::new(
-                    input
-                        .chars()
-                        .filter(|c| *c != ' ')
-                        .filter(|c| *c != '\t') // tabulation
-                        .filter(|c| *c != '\r') // caret return
-                )
-            ).filter(|c| *c != '\n') // newline
+            input
+                .chars()
+                .filter(|c| *c != ' ')
+                .filter(|c| *c != '\t') // tabulation
+                .filter(|c| *c != '\r') // caret return
+        );
+        let iter: AnyIter<char> = Box::new(
+            WithoutComments::new(iter.peekable()).filter(|c| *c != '\n') // newline
         );
 
         Self {
