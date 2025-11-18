@@ -2,35 +2,40 @@ mod tests;
 pub mod token;
 pub mod character;
 
+use std::iter::Peekable;
+
 use token::*;
 use character::*;
 use crate::shared::types::AnyIter;
 
 struct Scanner {
-    source: AnyIter<char>,
+    source: Peekable<AnyIter<char>>,
 }
 
 impl Scanner {
     // TODO: try to avoid 'static lifetime
     fn new(input: &'static str) -> Self {
+        let iter: AnyIter<char> = Box::new(
+            WithoutComments::new(
+                Box::new(
+                    input
+                        .chars()
+                        .filter(|c| *c != ' ')
+                        .filter(|c| *c != '\t') // tabulation
+                        .filter(|c| *c != '\r') // caret return
+                )
+            ).filter(|c| *c != '\n') // newline
+        );
+
         Self {
-            source: Box::new(
-                WithoutComments::new(
-                    Box::new(
-                        input
-                            .chars()
-                            .filter(|c| *c != ' ')
-                            .filter(|c| *c != '\t') // tabulation
-                            .filter(|c| *c != '\r') // caret return
-                    )
-                ).filter(|c| *c != '\n') // newline
-            ),
+            source: iter.peekable(),
         }
     }
 
     fn scan_token_kind(&mut self) -> TokenKind {
-        if let Some(value) = self.source.next() {
-            Character::new(value).token_kind()
+        if let Some(current) = self.source.next() {
+            let next = self.source.peek().copied();
+            Character::new(current, next).token_kind()
         } else {
             TokenKind::Eof
         }
