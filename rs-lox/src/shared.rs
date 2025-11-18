@@ -1,3 +1,2 @@
-pub mod types {
-    pub type AnyIter<T> = Box<dyn Iterator<Item = T>>;
-}
+pub mod types;
+pub mod exts;
