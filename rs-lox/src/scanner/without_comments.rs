@@ -1,12 +1,12 @@
-use std::iter::Peekable;
+use std::{ iter::Peekable };
 
-use crate::shared::{ types::AnyIter, exts::IteratorExt };
+use crate::shared::{ types::CharIter, exts::IteratorExt };
 
-pub struct WithoutComments(Peekable<AnyIter<char>>);
+pub struct WithoutComments(Peekable<CharIter>);
 
 impl WithoutComments {
-    pub fn new(iter: Peekable<AnyIter<char>>) -> Self {
-        Self(iter)
+    pub fn new(iter: Peekable<CharIter>) -> Box<Self> {
+        Box::new(Self(iter))
     }
 }
 
@@ -26,4 +26,10 @@ impl Iterator for WithoutComments {
             Some(first)
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    // TODO: what is supposed to be placed here?
+    // should i move some comments tests from scanner?
 }
