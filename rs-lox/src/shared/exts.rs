@@ -3,6 +3,7 @@ use std::iter::Peekable;
 use crate::shared::types::AnyIter;
 
 // TODO: find more idiomatic way to implement this, maybe without extension
+// try to use `iter.by_ref().skip_while` instead of this
 pub trait IteratorExt {
     type Item;
     fn skip_while_borrow<P>(&mut self, predicate: &mut P) -> &mut Self
