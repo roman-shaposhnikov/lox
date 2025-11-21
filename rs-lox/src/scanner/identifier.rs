@@ -13,6 +13,6 @@ impl<'a> Identifier<'a> {
             .by_ref()
             .take_while(|c| c.is_alphanumeric())
             .collect();
-        Keyword::new(name).token_kind().unwrap_or(TokenKind::Identifier)
+        Keyword::new(&name).token_kind().unwrap_or(TokenKind::Identifier)
     }
 }
