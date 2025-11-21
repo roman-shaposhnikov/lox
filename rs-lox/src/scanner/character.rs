@@ -1,45 +1,45 @@
+use crate::scanner::types::Source;
+
 use super::token::TokenKind;
 
-pub struct Character {
-    current: char,
-    next: Option<char>,
-}
+pub struct Character<'a>(&'a mut Source);
 
-impl Character {
-    pub fn new(current: char, next: Option<char>) -> Self {
-        Self { current, next }
+impl<'a> Character<'a> {
+    pub fn new(start: &'a mut Source) -> Self {
+        Self(start)
     }
 
-    pub fn token_kind(&self) -> TokenKind {
-        match self.current {
-            '(' => TokenKind::LeftParen,
-            ')' => TokenKind::RightParen,
-            '{' => TokenKind::LeftBrace,
-            '}' => TokenKind::RightBrace,
-            ';' => TokenKind::Semicolon,
-            ',' => TokenKind::Comma,
-            '.' => TokenKind::Dot,
-            '-' => TokenKind::Minus,
-            '+' => TokenKind::Plus,
-            '/' => TokenKind::Slash,
-            '*' => TokenKind::Star,
-            '!' => {
+    pub fn token_kind(&mut self) -> TokenKind {
+        match self.0.next() {
+            Some('(') => TokenKind::LeftParen,
+            Some(')') => TokenKind::RightParen,
+            Some('{') => TokenKind::LeftBrace,
+            Some('}') => TokenKind::RightBrace,
+            Some(';') => TokenKind::Semicolon,
+            Some(',') => TokenKind::Comma,
+            Some('.') => TokenKind::Dot,
+            Some('-') => TokenKind::Minus,
+            Some('+') => TokenKind::Plus,
+            Some('/') => TokenKind::Slash,
+            Some('*') => TokenKind::Star,
+            Some('!') => {
                 if self.next_is('=') { TokenKind::BangEqual } else { TokenKind::Bang }
             }
-            '=' => {
+            Some('=') => {
                 if self.next_is('=') { TokenKind::EqualEqual } else { TokenKind::Equal }
             }
-            '>' => {
+            Some('>') => {
                 if self.next_is('=') { TokenKind::GreaterEqual } else { TokenKind::Greater }
             }
-            '<' => {
+            Some('<') => {
                 if self.next_is('=') { TokenKind::LessEqual } else { TokenKind::Less }
             }
             _ => TokenKind::Error,
         }
     }
 
-    fn next_is(&self, expected: char) -> bool {
-        self.next.is_some_and(|c| c == expected)
+    fn next_is(&mut self, expected: char) -> bool {
+        let tmp = &expected;
+        self.0.next_if_eq(tmp).is_some()
     }
 }
