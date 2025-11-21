@@ -23,6 +23,25 @@ pub enum TokenKind {
     GreaterEqual,
     Less,
     LessEqual,
+    // Literals.
+    Identifier,
+    // Keywords.
+    And,
+    Class,
+    Else,
+    False,
+    For,
+    Fun,
+    If,
+    Nil,
+    Or,
+    Print,
+    Return,
+    Super,
+    This,
+    True,
+    Var,
+    While,
 }
 
 pub struct Token {

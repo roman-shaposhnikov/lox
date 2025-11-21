@@ -1,21 +1,21 @@
 mod tests;
+pub mod types;
 pub mod token;
 pub mod character;
 pub mod without_comments;
 pub mod without_white_space;
 pub mod without_new_lines;
-
-use std::{ iter::Peekable };
+pub mod identifier;
+pub mod keyword;
 
 use token::*;
 use character::*;
 use without_comments::WithoutComments;
-use crate::{
-    scanner::{ without_new_lines::WithoutNewLines, without_white_space::WithoutWhiteSpace },
-    shared::{ exts::IteratorExt, types::CharIter },
-};
-
-type Source = Peekable<CharIter>;
+use identifier::Identifier;
+use types::Source;
+use without_new_lines::WithoutNewLines;
+use without_white_space::WithoutWhiteSpace;
+use crate::shared::types::CharIter;
 
 struct Scanner {
     source: Source,
@@ -33,11 +33,20 @@ impl Scanner {
     }
 
     fn scan(&mut self) -> TokenKind {
-        if let Some(current) = self.source.next() {
-            let next = self.source.peek().copied();
-            Character::new(current, next).token_kind()
+        let current = self.source.peek().copied();
+        if current.is_some() {
+            self.match_token(current.unwrap())
         } else {
             TokenKind::Eof
+        }
+    }
+
+    // TODO: move logic to Token struct?
+    fn match_token(&mut self, current: char) -> TokenKind {
+        if current.is_alphabetic() {
+            Identifier::new(&mut self.source).token_kind()
+        } else {
+            Character::new(&mut self.source).token_kind()
         }
     }
 }

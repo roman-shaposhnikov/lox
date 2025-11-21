@@ -70,3 +70,29 @@ fn skip_whitespace(#[case] input: &'static str, #[case] expected: TokenKind) {
 fn skip_comments(#[case] input: &'static str, #[case] expected: TokenKind) {
     match_token(input, expected);
 }
+
+#[rstest]
+#[case("and", TokenKind::And)]
+#[case("class", TokenKind::Class)]
+#[case("else", TokenKind::Else)]
+#[case("if", TokenKind::If)]
+#[case("nil", TokenKind::Nil)]
+#[case("or", TokenKind::Or)]
+#[case("print", TokenKind::Print)]
+#[case("return", TokenKind::Return)]
+#[case("super", TokenKind::Super)]
+#[case("var", TokenKind::Var)]
+#[case("while", TokenKind::While)]
+#[case("false", TokenKind::False)]
+#[case("for", TokenKind::For)]
+#[case("fun", TokenKind::Fun)]
+#[case("this", TokenKind::This)]
+#[case("true", TokenKind::True)]
+fn match_keyword(#[case] input: &'static str, #[case] expected: TokenKind) {
+    match_token(input, expected);
+}
+
+#[test]
+fn match_identifier() {
+    match_token("notKeyword", TokenKind::Identifier);
+}
