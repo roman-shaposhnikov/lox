@@ -7,12 +7,14 @@ pub mod without_white_space;
 pub mod without_new_lines;
 pub mod identifier;
 pub mod keyword;
+pub mod number;
 
 use token::*;
 use character::*;
 use without_comments::WithoutComments;
 use identifier::Identifier;
 use types::Source;
+use number::Number;
 use without_new_lines::WithoutNewLines;
 use without_white_space::WithoutWhiteSpace;
 use crate::shared::types::CharIter;
@@ -45,6 +47,8 @@ impl Scanner {
     fn match_token(&mut self, current: char) -> TokenKind {
         if current.is_alphabetic() {
             Identifier::new(&mut self.source).token_kind()
+        } else if current.is_numeric() {
+            Number::new(&mut self.source).token_kind()
         } else {
             Character::new(&mut self.source).token_kind()
         }

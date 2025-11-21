@@ -10,7 +10,7 @@ fn empty_string_contains_eof_at_first_place() {
     assert_eq!(token.kind, TokenKind::Eof);
 }
 
-fn match_token(input: &'static str, expected: TokenKind) {
+fn match_token_kind(input: &'static str, expected: TokenKind) {
     let mut scanner = Scanner::new(input);
     let token = scanner.next().unwrap();
     assert_eq!(token.kind, expected, "input \"{input}\" to be a {expected:?} token");
@@ -29,7 +29,7 @@ fn match_token(input: &'static str, expected: TokenKind) {
 #[case("/", TokenKind::Slash)]
 #[case("*", TokenKind::Star)]
 fn match_single_character_token(#[case] input: &'static str, #[case] expected: TokenKind) {
-    match_token(input, expected)
+    match_token_kind(input, expected)
 }
 
 #[rstest]
@@ -42,7 +42,7 @@ fn match_single_character_token(#[case] input: &'static str, #[case] expected: T
 #[case("<", TokenKind::Less)]
 #[case("<=", TokenKind::LessEqual)]
 fn match_one_or_two_character_token(#[case] input: &'static str, #[case] expected: TokenKind) {
-    match_token(input, expected)
+    match_token_kind(input, expected)
 }
 
 #[rstest]
@@ -56,7 +56,7 @@ fn match_one_or_two_character_token(#[case] input: &'static str, #[case] expecte
 #[case("\t{", TokenKind::LeftBrace)] // tabulation
 #[case("\r", TokenKind::Eof)] // caret return
 fn skip_whitespace(#[case] input: &'static str, #[case] expected: TokenKind) {
-    match_token(input, expected);
+    match_token_kind(input, expected);
 }
 
 #[rstest]
@@ -68,7 +68,7 @@ fn skip_whitespace(#[case] input: &'static str, #[case] expected: TokenKind) {
 // comment // inside comment
 -", TokenKind::Minus)]
 fn skip_comments(#[case] input: &'static str, #[case] expected: TokenKind) {
-    match_token(input, expected);
+    match_token_kind(input, expected);
 }
 
 #[rstest]
@@ -89,10 +89,19 @@ fn skip_comments(#[case] input: &'static str, #[case] expected: TokenKind) {
 #[case("this", TokenKind::This)]
 #[case("true", TokenKind::True)]
 fn match_keyword(#[case] input: &'static str, #[case] expected: TokenKind) {
-    match_token(input, expected);
+    match_token_kind(input, expected);
 }
 
 #[test]
 fn match_identifier() {
-    match_token("notKeyword", TokenKind::Identifier);
+    match_token_kind("notKeyword", TokenKind::Identifier);
+}
+
+#[rstest]
+#[case("42")]
+#[case("123.124")]
+#[case("0")]
+#[case("5")]
+fn match_number(#[case] input: &'static str) {
+    match_token_kind(input, TokenKind::Number);
 }
