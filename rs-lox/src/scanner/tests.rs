@@ -105,3 +105,18 @@ fn match_identifier() {
 fn match_number(#[case] input: &'static str) {
     match_token_kind(input, TokenKind::Number);
 }
+
+#[rstest]
+#[case("\"\"")]
+#[case("\"str\"asdfasf")]
+#[case("\"test\nstring\"")]
+#[case("\"-string 'with' quotes?\"")]
+#[case("\"12341\"")]
+fn match_string(#[case] input: &'static str) {
+    match_token_kind(input, TokenKind::String);
+}
+
+#[test]
+fn produce_error_token_on_unterminated_string() {
+    match_token_kind("\"start", TokenKind::Error);
+}
