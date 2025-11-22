@@ -1,6 +1,6 @@
 use std::{ iter::Peekable };
 
-use crate::shared::{ types::CharIter, exts::IteratorExt };
+use crate::shared::{ types::CharIter };
 
 pub struct WithoutComments(Peekable<CharIter>);
 
@@ -18,7 +18,13 @@ impl Iterator for WithoutComments {
         if first == '/' {
             let second = self.0.peek();
             if let Some('/') = second {
-                self.0.skip_while_borrow(&mut (|n| n != '\n')).next()
+                // A comment goes until the end of the line.
+                // TODO: implement it by method skip_line, maybe inside CharIter struct
+                self.0
+                    .by_ref()
+                    .skip_while(|n| *n != '\n')
+                    .next();
+                self.0.next()
             } else {
                 Some(first)
             }
