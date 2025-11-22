@@ -2,9 +2,9 @@ use crate::scanner::token::TokenKind;
 
 use super::types::Source;
 
-pub struct String<'a>(&'a mut Source);
+pub struct LoxString<'a>(&'a mut Source);
 
-impl<'a> String<'a> {
+impl<'a> LoxString<'a> {
     pub fn new(start: &'a mut Source) -> Self {
         Self(start)
     }

@@ -1,5 +1,6 @@
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum TokenKind {
+    // TODO: maybe remove Eof token and use just None instead?
     Eof,
     Error,
     // Single-character tokens.
@@ -46,6 +47,7 @@ pub enum TokenKind {
     While,
 }
 
+#[derive(Debug)]
 pub struct Token {
     pub kind: TokenKind,
 }
