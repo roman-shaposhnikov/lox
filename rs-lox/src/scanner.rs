@@ -8,6 +8,7 @@ pub mod without_new_lines;
 pub mod identifier;
 pub mod keyword;
 pub mod number;
+pub mod string;
 
 use token::*;
 use character::*;
@@ -15,6 +16,7 @@ use without_comments::WithoutComments;
 use identifier::Identifier;
 use types::Source;
 use number::Number;
+use string::String;
 use without_new_lines::WithoutNewLines;
 use without_white_space::WithoutWhiteSpace;
 use crate::shared::types::CharIter;
@@ -36,8 +38,8 @@ impl Scanner {
 
     fn scan(&mut self) -> TokenKind {
         let current = self.source.peek().copied();
-        if current.is_some() {
-            self.match_token(current.unwrap())
+        if let Some(c) = current {
+            self.match_token(c)
         } else {
             TokenKind::Eof
         }
@@ -49,6 +51,8 @@ impl Scanner {
             Identifier::new(&mut self.source).token_kind()
         } else if current.is_numeric() {
             Number::new(&mut self.source).token_kind()
+        } else if current == '"' {
+            String::new(&mut self.source).token_kind()
         } else {
             Character::new(&mut self.source).token_kind()
         }

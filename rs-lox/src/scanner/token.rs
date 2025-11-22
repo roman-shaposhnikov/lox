@@ -25,6 +25,7 @@ pub enum TokenKind {
     LessEqual,
     // Literals.
     Identifier,
+    String,
     Number,
     // Keywords.
     And,
