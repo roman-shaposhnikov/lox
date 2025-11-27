@@ -52,7 +52,6 @@ impl Scanner {
         if current.is_ascii_alphabetic() {
             Identifier::new(&mut self.source).token_kind()
         } else if current.is_ascii_digit() {
-            // FIXME: number spamming
             Number::new(&mut self.source).token_kind()
         } else if current == '"' {
             LoxString::new(&mut self.source).token_kind()
