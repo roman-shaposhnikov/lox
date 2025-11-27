@@ -1,4 +1,4 @@
-use crate::scanner::token::TokenKind;
+use crate::{ scanner::token::TokenKind, shared::exts::PeekableExt };
 
 use super::types::Source;
 
@@ -10,6 +10,7 @@ impl<'a> Number<'a> {
     }
 
     pub fn token_kind(&mut self) -> TokenKind {
+        self.0.take_while_next(|c| c.is_ascii_digit()).collect::<String>();
         TokenKind::Number
     }
 }

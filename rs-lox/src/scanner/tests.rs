@@ -115,32 +115,17 @@ fn match_number(#[case] input: &'static str) {
 fn match_string(#[case] input: &'static str) {
     match_token_kind(input, TokenKind::String);
 }
- 
+
 #[rstest]
-#[case(
-    "\"\"",
-    vec![TokenKind::String]
-)]
-#[case(
-    "\"str\"asdfasf",
-    vec![TokenKind::String, TokenKind::Identifier]
-)]
-#[case(
-    "asdfasf\"str\"",
-    vec![TokenKind::Identifier, TokenKind::String]
-)]
-#[case(
-    "\"test\nstring\"",
-    vec![TokenKind::String]
-)]
-#[case(
-    "\"-string 'with' quotes?\"",
-    vec![TokenKind::String]
-)]
-#[case(
-    "\"12341\"",
-    vec![TokenKind::String]
-)]
+#[case("\"\"", vec![TokenKind::String])]
+// match identifier after string
+#[case("\"str\"asdfasf", vec![TokenKind::String, TokenKind::Identifier])]
+#[case("asdfasf\"str\"", vec![TokenKind::Identifier, TokenKind::String])]
+#[case("\"test\nstring\"", vec![TokenKind::String])]
+#[case("\"-string 'with' quotes?\"", vec![TokenKind::String])]
+#[case("\"12341\"", vec![TokenKind::String])]
+// match identifier after number
+#[case("1 a", vec![TokenKind::Number, TokenKind::Identifier])]
 fn match_sequence(#[case] input: &'static str, #[case] expected: Vec<TokenKind>) {
     let full_expected = [expected, vec![TokenKind::Eof]].concat();
     let result: Vec<TokenKind> = Scanner::new(input)
