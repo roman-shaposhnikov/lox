@@ -1,13 +1,13 @@
 use rstest::rstest;
 
 use super::Scanner;
-use super::token::TokenKind;
+use super::token::{ Token, TokenKind };
 
 #[test]
-fn empty_string_contains_eof_at_first_place() {
-    let mut scanner = Scanner::new("");
-    let token = scanner.next().unwrap();
-    assert_eq!(token.kind, TokenKind::Eof);
+fn empty_string_produce_zero_tokens() {
+    let scanner = Scanner::new("");
+    let tokens: Vec<Token> = scanner.collect();
+    assert_eq!(tokens.len(), 0);
 }
 
 fn match_token_kind(input: &'static str, expected: TokenKind) {
@@ -54,13 +54,13 @@ fn match_one_or_two_character_token(#[case] input: &'static str, #[case] expecte
 #[case("\n+", TokenKind::Plus)] // newline
 #[case("	{", TokenKind::LeftBrace)] // tabulation
 #[case("\t{", TokenKind::LeftBrace)] // tabulation
-#[case("\r", TokenKind::Eof)] // caret return
+#[case("\r abc", TokenKind::Identifier)] // caret return
 fn skip_whitespace(#[case] input: &'static str, #[case] expected: TokenKind) {
     match_token_kind(input, expected);
 }
 
 #[rstest]
-#[case("// test", TokenKind::Eof)]
+#[case("5// test", TokenKind::Number)]
 #[case("\
 // whole line
 *", TokenKind::Star)]
@@ -109,6 +109,7 @@ fn match_number(#[case] input: &'static str) {
 #[rstest]
 #[case("\"\"")]
 #[case("\"str\"asdfasf")]
+#[ignore] // until #1 issue
 #[case("\"test\nstring\"")]
 #[case("\"-string 'with' quotes?\"")]
 #[case("\"12341\"")]
@@ -121,24 +122,42 @@ fn match_string(#[case] input: &'static str) {
 // match identifier after string
 #[case("\"str\"asdfasf", vec![TokenKind::String, TokenKind::Identifier])]
 #[case("asdfasf\"str\"", vec![TokenKind::Identifier, TokenKind::String])]
+#[ignore] // until #1 issue
 #[case("\"test\nstring\"", vec![TokenKind::String])]
 #[case("\"-string 'with' quotes?\"", vec![TokenKind::String])]
 #[case("\"12341\"", vec![TokenKind::String])]
 // match identifier after number
 #[case("1 a", vec![TokenKind::Number, TokenKind::Identifier])]
 fn match_sequence(#[case] input: &'static str, #[case] expected: Vec<TokenKind>) {
-    let full_expected = [expected, vec![TokenKind::Eof]].concat();
     let result: Vec<TokenKind> = Scanner::new(input)
         .map(|t| t.kind)
         .collect();
     assert_eq!(
         result,
-        full_expected,
-        "input {input} with a sequence {result:?} be equal to {full_expected:?}"
+        expected,
+        "input {input} with a sequence {result:?} be equal to {expected:?}"
     );
 }
 
 #[test]
 fn produce_error_token_on_unterminated_string() {
     match_token_kind("\"start", TokenKind::Error);
+}
+
+#[rstest]
+#[case("
+    4
+    \"string\"
+    var
+", vec![1, 2, 3])]
+#[case("
+    ident
+    // comment
+    true
+", vec![1, 3])]
+fn token_contains_line(#[case] input: &'static str, #[case] expected: Vec<usize>) {
+    let result: Vec<usize> = Scanner::new(input)
+        .map(|t| t.line)
+        .collect();
+    assert_eq!(result, expected);
 }

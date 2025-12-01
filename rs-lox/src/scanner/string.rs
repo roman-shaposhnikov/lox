@@ -12,7 +12,7 @@ impl<'a> LoxString<'a> {
     pub fn token_kind(&mut self) -> TokenKind {
         self.0.next(); // consume first quote
         // TODO: should keep newlines inside string somehow
-        // but currently it's filtering at start
+        // but currently it's splits by newline at start
         let mut rest = self.0
             .by_ref()
             .skip_while(|c| *c != '"')

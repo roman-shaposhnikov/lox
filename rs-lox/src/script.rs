@@ -4,6 +4,7 @@ pub struct Script(String);
 
 impl Script {
     pub fn build(path: String) -> Self {
+        // TODO: handle file read errors
         let content = fs::read_to_string(path).unwrap();
         Self(content)
     }
