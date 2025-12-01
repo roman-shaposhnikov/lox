@@ -3,7 +3,7 @@ pub mod token;
 mod tests;
 mod types;
 mod line;
-mod character;
+mod operator;
 mod without_comments;
 mod without_white_space;
 mod without_new_lines;
