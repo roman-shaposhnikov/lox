@@ -2,9 +2,9 @@ use crate::scanner::types::Source;
 
 use super::token::TokenKind;
 
-pub struct Character<'a>(&'a mut Source);
+pub struct Operator<'a>(&'a mut Source);
 
-impl<'a> Character<'a> {
+impl<'a> Operator<'a> {
     pub fn new(start: &'a mut Source) -> Self {
         Self(start)
     }

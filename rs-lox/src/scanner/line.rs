@@ -1,7 +1,7 @@
 use crate::shared::types::CharIter;
 
 use super::token::{ Token, TokenKind };
-use super::character::Character;
+use super::operator::Operator;
 use super::without_comments::WithoutComments;
 use super::identifier::Identifier;
 use super::types::Source;
@@ -39,7 +39,7 @@ impl Line {
         } else if current == '"' {
             LoxString::new(&mut self.source).token_kind()
         } else {
-            Character::new(&mut self.source).token_kind()
+            Operator::new(&mut self.source).token_kind()
         }
     }
 }
