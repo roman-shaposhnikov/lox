@@ -1,8 +1,5 @@
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum TokenKind {
-    // TODO: maybe remove Eof token and use just None instead?
-    // then we can make iter fuse in Scanner
-    Eof,
     Error,
     // Single-character tokens.
     LeftParen,
@@ -51,4 +48,5 @@ pub enum TokenKind {
 #[derive(Debug)]
 pub struct Token {
     pub kind: TokenKind,
+    pub line: usize,
 }
