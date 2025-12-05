@@ -2,15 +2,15 @@ use std::{ iter::Peekable };
 
 use crate::shared::{ types::CharIter };
 
-pub struct WithoutComments(Peekable<CharIter>);
+pub struct SkipComments(Peekable<CharIter>);
 
-impl WithoutComments {
+impl SkipComments {
     pub fn new(iter: Peekable<CharIter>) -> Box<Self> {
         Box::new(Self(iter))
     }
 }
 
-impl Iterator for WithoutComments {
+impl Iterator for SkipComments {
     type Item = char;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -36,6 +36,18 @@ impl Iterator for WithoutComments {
 
 #[cfg(test)]
 mod tests {
-    // TODO: what is supposed to be placed here?
-    // should i move some comments tests from scanner?
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    #[case("5// test", "5")]
+    #[case("// whole line", "")]
+    #[case("// comment // inside comment", "")]
+    fn skip_comments(#[case] input: &'static str, #[case] expected: &'static str) {
+        let source: CharIter = Box::new(input.chars());
+        let source: CharIter = SkipComments::new(source.peekable());
+        let result = source.collect::<String>();
+        assert_eq!(result, expected);
+    }
 }
