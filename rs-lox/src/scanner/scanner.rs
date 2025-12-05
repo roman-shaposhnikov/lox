@@ -11,9 +11,9 @@ pub struct Scanner {
 // TODO: should avoid scanner and move it logic to Script object?
 impl Scanner {
     // TODO: try to avoid 'static lifetime
-    pub fn new(input: &'static str) -> Self {
+    pub fn new(script: &'static str) -> Self {
         let mut lines: AnyIter<Line> = Box::new(
-            input
+            script
                 // TODO #1 keep newlines inside of LoxString
                 .lines()
                 // TODO try to fix order of `enumerate -> filter` by types rather then tests
