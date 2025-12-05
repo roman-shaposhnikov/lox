@@ -17,8 +17,10 @@ impl Scanner {
             input
                 // TODO #1 keep newlines inside of LoxString
                 .lines()
-                .filter(|l| !l.is_empty())
+                // TODO try to fix order of `enumerate -> filter` by types rather then tests
                 .enumerate()
+                .filter(|(_, l)| !l.is_empty())
+                .filter(|(_, l)| !l.trim_start().starts_with("//"))
                 .map(Line::new)
         );
         Self { current: lines.next(), lines }
@@ -37,5 +39,29 @@ impl Iterator for Scanner {
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    #[case("\
+    4
+    \"string\"
+    var", vec![1, 2, 3])]
+    #[case("\
+    ident
+
+    // comment
+    true", vec![1, 4])]
+    fn token_contains_line(#[case] input: &'static str, #[case] expected: Vec<usize>) {
+        let result: Vec<usize> = Scanner::new(input)
+            .map(|t| t.pos.line)
+            .collect();
+        assert_eq!(result, expected);
     }
 }

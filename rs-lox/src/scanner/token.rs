@@ -1,4 +1,4 @@
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum TokenKind {
     Error,
     // Single-character tokens.
@@ -23,9 +23,9 @@ pub enum TokenKind {
     Less,
     LessEqual,
     // Literals.
-    Identifier,
-    String,
-    Number,
+    Identifier(String),
+    String(String),
+    Number(String),
     // Keywords.
     And,
     Class,
@@ -48,5 +48,12 @@ pub enum TokenKind {
 #[derive(Debug)]
 pub struct Token {
     pub kind: TokenKind,
+    pub pos: Position,
+}
+
+#[derive(Debug)]
+pub struct Position {
     pub line: usize,
+    pub col: usize,
+    pub len: usize,
 }
