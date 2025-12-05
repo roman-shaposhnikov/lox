@@ -5,7 +5,6 @@ mod line;
 mod sequence;
 mod operator;
 mod skip_comments;
-mod increase_line;
 mod identifier;
 mod number;
 mod string;
