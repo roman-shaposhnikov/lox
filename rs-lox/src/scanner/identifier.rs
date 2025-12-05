@@ -21,8 +21,8 @@ impl Identifier {
     }
 
     pub fn token(self) -> SeqToken {
-        let (length, kind) = self.token_kind();
-        SeqToken { kind, len: length }
+        let (len, kind) = self.token_kind();
+        SeqToken { kind, len }
     }
 
     fn token_kind(self) -> (usize, TokenKind) {
