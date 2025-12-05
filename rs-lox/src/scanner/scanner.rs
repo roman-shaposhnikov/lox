@@ -12,7 +12,6 @@ pub struct Scanner {
 impl Scanner {
     // TODO: try to avoid 'static lifetime
     pub fn new(input: &'static str) -> Self {
-        // TODO: should make it fuse?
         let mut lines: AnyIter<Line> = Box::new(
             input
                 // TODO #1 keep newlines inside of LoxString
