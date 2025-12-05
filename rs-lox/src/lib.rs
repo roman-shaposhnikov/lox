@@ -1,4 +1,5 @@
 pub mod script;
-pub mod scanner;
+
+mod scanner;
 
 mod shared;

@@ -1,16 +1,20 @@
-use std::{ fs, ops::Deref };
+use std::{ error::Error, fs, ops::Deref };
+
+use super::scanner::{ Scanner, token::Token };
 
 pub struct Script(String);
 
 impl Script {
-    pub fn build(path: String) -> Self {
-        // TODO: handle file read errors
-        let content = fs::read_to_string(path).unwrap();
-        Self(content)
+    pub fn new(path: String) -> Self {
+        Self(path)
     }
 
-    pub fn leak(self) -> &'static String {
-        Box::leak(Box::new(self))
+    pub fn tokens(self) -> Result<Vec<Token>, Box<dyn Error>> {
+        let content = fs::read_to_string(self.0)?;
+        let script: &'static String = Box::leak(Box::new(content));
+        let scanner = Scanner::new(&script);
+        let tokens = scanner.collect::<Vec<Token>>();
+        Ok(tokens)
     }
 }
 
