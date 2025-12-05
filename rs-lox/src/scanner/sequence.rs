@@ -53,7 +53,6 @@ impl Iterator for Sequence {
 #[derive(Debug)]
 pub struct LineToken {
     pub kind: TokenKind,
-    // TODO: convert to u32 or u64
     pub col: usize,
     pub len: usize,
 }
