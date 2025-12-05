@@ -5,9 +5,15 @@ use super::{ types::Source, token::TokenKind, sequence::SeqToken };
 pub struct Number<'a>(&'a mut Source);
 
 impl<'a> Number<'a> {
-    // TODO: panic if first char non ascii digit
-    pub fn new(start: &'a mut Source) -> Self {
-        Self(start)
+    /// Create a new Identifier parser.
+    ///
+    /// # Panics
+    ///
+    /// The `new` function will panic if the source starts with non ascii digit char.
+    pub fn new(source: &'a mut Source) -> Self {
+        let starts_with_digit = source.peek().is_some_and(|(_, c)| c.is_ascii_digit());
+        assert!(starts_with_digit, "first char of number should be ascii digit");
+        Self(source)
     }
 
     pub fn token(&mut self) -> SeqToken {
