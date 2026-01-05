@@ -2,6 +2,7 @@ use crate::shared::types::AnyIter;
 
 use super::token::Token;
 use super::line::Line;
+use super::lox_lines::LoxLines;
 
 pub struct Scanner {
     lines: AnyIter<Line>,
@@ -13,11 +14,7 @@ impl Scanner {
     // TODO: try to avoid 'static lifetime
     pub fn new(script: &'static str) -> Self {
         let mut lines: AnyIter<Line> = Box::new(
-            script
-                // TODO #1 keep newlines inside of LoxString
-                .lines()
-                // TODO try to fix order of `enumerate -> filter` by types rather then tests
-                .enumerate()
+            LoxLines::new(script)
                 .filter(|(_, l)| !l.is_empty())
                 .filter(|(_, l)| !l.trim_start().starts_with("//"))
                 .map(Line::new)

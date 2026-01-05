@@ -2,6 +2,7 @@ pub mod scanner;
 pub mod token;
 mod types;
 mod line;
+mod lox_lines;
 mod sequence;
 mod operator;
 mod skip_comments;
