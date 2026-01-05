@@ -1,4 +1,4 @@
-pub mod scanner;
+pub mod tokens;
 pub mod token;
 mod types;
 mod line;
@@ -13,4 +13,4 @@ mod string;
 #[cfg(test)]
 mod tests;
 
-pub use scanner::*;
+pub use tokens::*;
