@@ -24,7 +24,7 @@ impl Iterator for Line {
 
     fn next(&mut self) -> Option<Self::Item> {
         let LineToken { kind, col, len } = self.sequence.next()?;
-        let pos = Position { line: self.index + 1, col, len };
+        let pos = Position { line: self.index, col, len };
         Some(Token { kind, pos })
     }
 }
